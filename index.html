@@ -8,7 +8,7 @@
 :root{
   --ink:#14171c; --soft:#5d646d; --rule:#dce2e9; --paper:#eef4fa; --panel:#fff;
   --green:#12844a; --blue:#1d5ea8; --black:#14171c;
-  --rock:#aebccb; --tree:#3f6350; --aspen:#8fae86; --lift:#c0392b; --bound:#d8a12a;
+  --tree:#3f6350; --aspen:#8fae86; --lift:#c0392b; --bound:#d8a12a;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);
@@ -26,13 +26,18 @@ body{margin:0;background:var(--paper);color:var(--ink);
 
 .stage{display:grid;grid-template-columns:1fr 292px;gap:24px;align-items:start}
 .map-card{background:#fff;border:1px solid var(--rule);border-radius:6px;
-  padding:5px 5px 0;overflow:hidden}
-svg{display:block;width:100%;height:auto}
+  padding:5px 5px 0;overflow:hidden;position:relative;outline:none}
+.map-card:focus{border-color:#8fa6bb;box-shadow:0 0 0 3px rgba(31,94,168,.16)}
+#hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(238,244,250,.72);z-index:5;cursor:pointer;transition:opacity .3s}
+#hint.off{opacity:0;pointer-events:none}
+#hint span{background:#14171c;color:#fff;font-family:system-ui,sans-serif;font-size:14px;
+  padding:11px 18px;border-radius:5px;box-shadow:0 6px 22px rgba(10,20,30,.22)}
+svg{display:block;width:100%;height:auto;touch-action:manipulation}
 
 /* ---------- edges ---------- */
-.edge .hit{fill:none;stroke:transparent;stroke-width:26;stroke-linecap:round}
-.edge .line{fill:none;stroke-width:3.6;stroke-linecap:round;
-  transition:stroke-width .15s,opacity .3s}
+.edge .line{fill:none;stroke-width:3.4;stroke-linecap:round;
+  transition:stroke-width .18s,opacity .25s}
 .edge .lbl{font-family:system-ui,sans-serif;font-size:12px;font-weight:500;fill:var(--ink);
   paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
 .edge.green .line{stroke:var(--green)} .edge.green .mk{fill:var(--green)}
@@ -42,58 +47,78 @@ svg{display:block;width:100%;height:auto}
 .edge.lift .bdg circle{fill:#fff;stroke:var(--lift);stroke-width:1.6}
 .edge.lift .bdg text{font-family:system-ui,sans-serif;font-size:10px;font-weight:700;
   fill:var(--lift);stroke:none}
-
-.edge{opacity:.2;pointer-events:none;transition:opacity .3s}
-.edge.open{opacity:1;pointer-events:auto;cursor:pointer}
-.edge.done{opacity:.48}
+.edge{opacity:.5;pointer-events:none;transition:opacity .25s}
+.edge.near{opacity:1}
+.edge.near .line{stroke-width:6.4}
+.edge.near.lift .line{stroke-width:3.4}
+.edge.done{opacity:.34}
 .edge.done .line{stroke-dasharray:2 5}
-.edge.open:hover .line{stroke-width:6.5}
-.edge.lift.open:hover .line{stroke-width:3.2}
-.edge:focus{outline:none}
-.edge.open:focus .line{stroke-width:6.5}
+.edge.done.near{opacity:1}
 
-.node{fill:#fff;stroke:#8496a8;stroke-width:1.8}
-.node.here{stroke:var(--ink);stroke-width:3.2}
+/* gates */
+.gate{fill:#fff;stroke:#7f8d9c;stroke-width:1.6;opacity:.85;transition:all .2s}
+.gate.hot{stroke:var(--ink);stroke-width:2.6;opacity:1}
+.gate.done{fill:#e6ecf2}
+.barrier{fill:#4a6a55;opacity:.17}
+
 .peaklbl{font-family:system-ui,sans-serif;font-size:10.5px;font-weight:600;fill:#5b6874;
   letter-spacing:.11em;text-transform:uppercase;paint-order:stroke;stroke:#fff;
   stroke-width:3.5px;stroke-linejoin:round}
 .elevlbl{font-family:system-ui,sans-serif;font-size:9px;fill:#8695a4;letter-spacing:.06em;
   paint-order:stroke;stroke:#fff;stroke-width:3px}
-.skier{fill:#14171c;stroke:#fff;stroke-width:2.6}
 .titleblk{font-family:system-ui,sans-serif;fill:#41505e}
 .legendbox{fill:#fff;stroke:var(--rule);stroke-width:1}
 .lgh{font-family:system-ui,sans-serif;font-size:9px;font-weight:700;fill:#8695a4;
   letter-spacing:.14em;text-transform:uppercase}
 .lgt{font-family:system-ui,sans-serif;font-size:10.5px;fill:#41505e}
 
+/* prompt bubble */
+#bubble{opacity:0;transition:opacity .18s;pointer-events:none}
+#bubble.on{opacity:1}
+#bubble rect{fill:#14171c;rx:4}
+#bubble text{font-family:system-ui,sans-serif;font-size:11px;fill:#fff;font-weight:500}
+
 /* ---------- HUD ---------- */
 .hud{background:var(--panel);border:1px solid var(--rule);border-radius:6px;
-  padding:18px 18px 8px;position:sticky;top:18px}
+  padding:18px;position:sticky;top:18px}
 .hud .where{font-family:system-ui,sans-serif;font-size:10.5px;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--soft);margin-bottom:3px}
-.hud .loc{font-size:20px;font-weight:600;margin-bottom:1px}
-.hud .elev{font-family:system-ui,sans-serif;font-size:12.5px;color:var(--soft);margin-bottom:14px}
-.hud .prompt{font-family:system-ui,sans-serif;font-size:13px;color:var(--soft);
-  border-top:1px solid var(--rule);padding-top:12px;margin-bottom:8px}
-.opts{list-style:none;margin:0 0 10px;padding:0}
-.opts button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;
-  background:none;border:0;border-radius:4px;padding:8px 7px;cursor:pointer;
-  font-family:system-ui,sans-serif;font-size:14.5px;color:var(--ink)}
-.opts button:hover{background:#eef4fa}
-.opts button .kind{margin-left:auto;font-size:11px;color:var(--soft)}
-.opts button.skied{color:var(--soft)}
-.liftmk{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--lift);
-  color:var(--lift);font-size:9.5px;font-weight:700;display:inline-flex;
-  align-items:center;justify-content:center;flex:none}
+  text-transform:uppercase;color:var(--soft);margin-bottom:4px}
+.hud .loc{font-size:19px;font-weight:600;margin-bottom:3px;line-height:1.3}
+.hud .sub{font-family:system-ui,sans-serif;font-size:13px;color:var(--soft);margin-bottom:14px}
+.go{width:100%;background:var(--ink);color:#fff;border:0;border-radius:4px;
+  font-family:system-ui,sans-serif;font-size:14px;font-weight:500;padding:11px;
+  cursor:pointer;margin-bottom:14px;display:none}
+.go.on{display:block}
+.go:hover{background:#2b3138}
+.keys{font-family:system-ui,sans-serif;font-size:12.5px;color:var(--soft);
+  border-top:1px solid var(--rule);padding-top:12px;margin-bottom:12px}
+kbd{font-family:system-ui,sans-serif;font-size:11px;background:#f0f4f8;
+  border:1px solid var(--rule);border-radius:3px;padding:1px 5px;color:var(--ink)}
 .card-count{font-family:system-ui,sans-serif;font-size:12px;color:var(--soft);
-  border-top:1px solid var(--rule);padding:11px 0;margin-top:4px}
+  border-top:1px solid var(--rule);padding-top:11px}
 .ticks{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
-.tick{width:14px;height:5px;background:var(--rule);border-radius:2px}
+.tick{width:14px;height:5px;background:var(--rule);border-radius:2px;transition:background .3s}
 .tick.on{background:var(--ink)}
-.chip{width:10px;height:10px;display:inline-block;flex:none}
+.chip{width:10px;height:10px;display:inline-block;flex:none;vertical-align:middle}
 .chip.green{background:var(--green);border-radius:50%}
 .chip.blue{background:var(--blue)}
 .chip.black{background:var(--black);transform:rotate(45deg)}
+.key{border-top:1px solid var(--rule);margin-top:14px;padding-top:12px;
+  font-family:system-ui,sans-serif;font-size:12.5px;color:#41505e}
+.key .kh{font-size:9.5px;font-weight:700;color:#8695a4;letter-spacing:.14em;
+  text-transform:uppercase;margin:12px 0 5px}
+.key .kh:first-child{margin-top:0}
+.key .kr{display:flex;align-items:center;gap:9px;margin-bottom:5px;line-height:1.4}
+.timber{width:14px;height:8px;border-radius:3px;background:#4a6a55;opacity:.45;flex:none}
+
+/* ---------- d-pad ---------- */
+.pad{display:none;margin-top:14px;grid-template-columns:repeat(3,52px);
+  grid-template-rows:repeat(3,52px);gap:6px;justify-content:center}
+.pad button{background:#fff;border:1px solid var(--rule);border-radius:6px;
+  font-size:18px;color:var(--ink);cursor:pointer;-webkit-user-select:none;user-select:none}
+.pad button:active{background:#e4ecf4}
+.pad .u{grid-area:1/2} .pad .l{grid-area:2/1} .pad .k{grid-area:2/2;font-size:11px;font-weight:600}
+.pad .r{grid-area:2/3} .pad .d{grid-area:3/2}
 
 /* ---------- sheet ---------- */
 .scrim{position:fixed;inset:0;background:rgba(14,23,32,.42);opacity:0;pointer-events:none;
@@ -126,8 +151,11 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
 @media (max-width:920px){
   .stage{grid-template-columns:1fr;gap:16px}
   .hud{position:static}
+  .pad{display:grid}
+  .keys{display:none}
   .edge .lbl{font-size:15px;stroke-width:5px}
   .peaklbl{font-size:13px} .elevlbl{font-size:11px}
+  #bubble text{font-size:14px}
   .sheet{width:100%;top:auto;bottom:0;height:88%;transform:translateY(102%);
     border-radius:12px 12px 0 0}
   .sheet.on{transform:translateY(0)}
@@ -146,12 +174,12 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
     <a class="ui" href="mailto:wittere@bc.edu">wittere@bc.edu</a>
   </header>
 
-  <p class="lede">I grew up skiing Steamboat, so I built this site as the mountain. You start at the base and can only ski what actually leaves from where you're standing; ride a lift, pick a run, and you&#8217;ll get a piece of my background leading up to my interest in investment banking. Nine runs, in whatever order you like.</p>
+  <p class="lede">I grew up skiing Steamboat, so I built this site as the mountain. Use the arrow keys to move around, ride the lifts up, and drop into any run to get a piece of my background leading up to my interest in investment banking. Nine runs, in whatever order you like.</p>
 
   <div class="stage">
 
-    <!-- ===================== MAP ===================== -->
-    <div class="map-card">
+    <div class="map-card" id="mapcard" tabindex="0">
+      <div id="hint"><span>Click here, then use the arrow keys to ski</span></div>
       <svg id="map" viewBox="0 0 1000 720" role="img" aria-label="Interactive trail map of Mount Werner">
         <defs>
           <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
@@ -164,37 +192,123 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
           </linearGradient>
           <g id="fir"><path d="M0 0 l5.5 14 -11 0 z" fill="var(--tree)"/></g>
           <g id="asp"><circle r="4" fill="var(--aspen)"/></g>
+
+          <!-- Keeps the timber and rock inside the mountain outline. -->
+          <clipPath id="mtn">
+            <path d="M 34 668 L 150 470 L 250 360 L 342 212 L 424 148 L 520 76
+                     L 620 158 L 712 222 L 812 342 L 912 492 L 968 668 Z"/>
+          </clipPath>
+
+          <!-- Cut corridors through the timber and rock wherever a TRAIL runs.
+               Purely visual: masks don't affect hit-testing, so the barriers
+               still block walking. Lifts get no cut — they fly over. -->
+          <mask id="cut">
+            <rect x="0" y="0" width="1000" height="720" fill="#fff"/>
+            <g fill="none" stroke="#000" stroke-width="30" stroke-linecap="round">
+              <path d="M 522 94 C 496 132, 440 172, 360 210"/>
+              <path d="M 358 220 C 386 260, 432 306, 496 354"/>
+              <path d="M 346 222 C 296 282, 290 342, 348 374 C 404 400, 462 386, 498 366"/>
+              <path d="M 704 234 C 666 272, 606 314, 508 352"/>
+              <path d="M 714 240 C 708 302, 632 350, 514 368"/>
+              <path d="M 720 238 C 792 322, 822 462, 780 562 C 740 634, 600 652, 512 640"/>
+              <path d="M 498 374 C 474 442, 470 522, 482 582 C 488 612, 494 626, 498 634"/>
+              <path d="M 508 374 C 548 438, 586 502, 576 558 C 564 610, 524 632, 506 636"/>
+              <path d="M 492 372 C 432 422, 342 454, 308 522 C 288 576, 382 624, 488 638"/>
+            </g>
+          </mask>
         </defs>
 
         <rect x="0" y="0" width="1000" height="300" fill="url(#sky)"/>
-        <!-- distant ridges -->
         <path d="M 0 250 L 90 196 L 168 228 L 250 178 L 318 222 L 372 200 L 372 300 L 0 300 Z"
               fill="#b9cfe2" opacity=".55"/>
         <path d="M 640 214 L 724 168 L 800 206 L 884 160 L 960 204 L 1000 184 L 1000 300 L 640 300 Z"
               fill="#b9cfe2" opacity=".55"/>
 
-        <!-- massif -->
-        <path d="M 34 668 L 150 470 L 250 360 L 342 212 L 424 148 L 520 76
+        <path id="massif"
+              d="M 34 668 L 150 470 L 250 360 L 342 212 L 424 148 L 520 76
                  L 620 158 L 712 222 L 812 342 L 912 492 L 968 668 Z"
               fill="url(#face)" stroke="#9fb3c6" stroke-width="1.6" stroke-linejoin="round"/>
         <path d="M 520 76 L 620 158 L 712 222 L 812 342 L 912 492 L 968 668 L 520 668 Z"
               fill="#0b2545" opacity=".045"/>
 
-        <!-- boundary -->
         <path d="M 58 652 L 164 478 L 262 372 L 350 228 L 428 164 L 520 94
                  L 612 172 L 702 236 L 800 352 L 896 496 L 946 652"
-              fill="none" stroke="var(--bound)" stroke-width="1.6" stroke-dasharray="7 6" opacity=".75"/>
+              fill="none" stroke="var(--bound)" stroke-width="1.6" stroke-dasharray="7 6" opacity=".7"/>
 
-        <!-- contours -->
-        <path d="M 108 540 Q 320 486 512 486 Q 700 486 880 544" fill="none" stroke="#aebccb" stroke-width=".8" opacity=".5"/>
-        <path d="M 186 432 Q 356 382 512 382 Q 672 382 828 436" fill="none" stroke="#aebccb" stroke-width=".8" opacity=".5"/>
-        <path d="M 278 306 Q 400 266 512 266 Q 626 266 742 310" fill="none" stroke="#aebccb" stroke-width=".8" opacity=".5"/>
+        <path d="M 108 540 Q 320 486 512 486 Q 700 486 880 544" fill="none" stroke="#aebccb" stroke-width=".8" opacity=".45"/>
+        <path d="M 186 432 Q 356 382 512 382 Q 672 382 828 436" fill="none" stroke="#aebccb" stroke-width=".8" opacity=".45"/>
+        <path d="M 278 306 Q 400 266 512 266 Q 626 266 742 310" fill="none" stroke="#aebccb" stroke-width=".8" opacity=".45"/>
 
-        <!-- rock outcrops near summit -->
         <path d="M 462 114 l 16 -9 14 11 -12 8 z" fill="#9aa8b6" opacity=".7"/>
         <path d="M 556 128 l 18 -8 13 12 -14 8 z" fill="#9aa8b6" opacity=".7"/>
 
-        <!-- tree stands (kept clear of labels and lines) -->
+        <!-- ============ BARRIERS: you can't walk through these ============ -->
+        <!-- The mask below only cuts the PICTURE; collision uses the raw paths. -->
+        <g mask="url(#cut)" clip-path="url(#mtn)">
+        <g id="barriers">
+          <path class="barrier" d="M 110 420 C 190 396, 260 424, 330 404 C 400 384, 470 414, 540 394
+                C 610 376, 680 406, 750 392 C 810 380, 860 404, 915 394
+                L 915 448 C 860 458, 810 434, 750 446 C 680 460, 610 430, 540 448
+                C 470 468, 400 438, 330 458 C 260 478, 190 450, 110 474 Z"/>
+          <path class="barrier" d="M 235 288 C 300 268, 360 294, 425 276 C 490 258, 550 286, 615 270
+                C 680 254, 750 284, 815 272
+                L 815 326 C 750 338, 680 308, 615 324 C 550 340, 490 312, 425 330
+                C 360 348, 300 322, 235 340 Z"/>
+          <path class="barrier" d="M 350 128 C 430 146, 470 120, 520 136 C 575 154, 620 126, 670 142
+                L 670 206 C 620 192, 575 218, 520 200 C 470 184, 430 210, 350 194 Z"/>
+          <path class="barrier" d="M 508 196 C 520 220, 502 244, 514 268 C 518 278, 516 284, 514 292
+                L 556 292 C 552 278, 560 262, 550 240 C 540 216, 558 210, 552 196 Z"/>
+        </g>
+        <!-- dressing: timber on the two low bands, broken rock up high -->
+        <g opacity=".9">
+          <use href="#fir" x="128" y="424"/><use href="#fir" x="154" y="416"/><use href="#fir" x="180" y="410"/>
+          <use href="#fir" x="206" y="414"/><use href="#fir" x="232" y="418"/><use href="#fir" x="258" y="414"/>
+          <use href="#fir" x="284" y="408"/><use href="#fir" x="310" y="403"/><use href="#fir" x="336" y="401"/>
+          <use href="#fir" x="362" y="398"/><use href="#fir" x="388" y="394"/><use href="#fir" x="414" y="392"/>
+          <use href="#fir" x="440" y="396"/><use href="#fir" x="466" y="398"/><use href="#fir" x="492" y="394"/>
+          <use href="#fir" x="518" y="390"/><use href="#fir" x="544" y="388"/><use href="#fir" x="570" y="384"/>
+          <use href="#fir" x="596" y="382"/><use href="#fir" x="622" y="384"/><use href="#fir" x="648" y="388"/>
+          <use href="#fir" x="674" y="392"/><use href="#fir" x="700" y="392"/><use href="#fir" x="726" y="388"/>
+          <use href="#fir" x="752" y="386"/><use href="#fir" x="778" y="384"/><use href="#fir" x="804" y="386"/>
+          <use href="#fir" x="830" y="390"/><use href="#fir" x="856" y="392"/><use href="#fir" x="882" y="390"/>
+          </g><g opacity=".7">
+          <use href="#fir" x="141" y="440"/><use href="#fir" x="193" y="430"/><use href="#fir" x="245" y="434"/>
+          <use href="#fir" x="297" y="422"/><use href="#fir" x="349" y="418"/><use href="#fir" x="401" y="410"/>
+          <use href="#fir" x="453" y="414"/><use href="#fir" x="505" y="408"/><use href="#fir" x="557" y="404"/>
+          <use href="#fir" x="609" y="400"/><use href="#fir" x="661" y="406"/><use href="#fir" x="713" y="408"/>
+          <use href="#fir" x="765" y="402"/><use href="#fir" x="817" y="406"/><use href="#fir" x="869" y="408"/>
+          </g><g opacity=".54">
+          <use href="#fir" x="167" y="456"/><use href="#fir" x="271" y="450"/><use href="#fir" x="375" y="430"/>
+          <use href="#fir" x="479" y="430"/><use href="#fir" x="583" y="420"/><use href="#fir" x="687" y="424"/>
+          <use href="#fir" x="791" y="420"/><use href="#fir" x="843" y="424"/>
+
+          </g><g opacity=".9">
+          <use href="#fir" x="252" y="296"/><use href="#fir" x="278" y="288"/><use href="#fir" x="304" y="280"/>
+          <use href="#fir" x="330" y="284"/><use href="#fir" x="356" y="288"/><use href="#fir" x="382" y="284"/>
+          <use href="#fir" x="408" y="278"/><use href="#fir" x="434" y="274"/><use href="#fir" x="460" y="270"/>
+          <use href="#fir" x="486" y="268"/><use href="#fir" x="512" y="272"/><use href="#fir" x="538" y="276"/>
+          <use href="#fir" x="564" y="272"/><use href="#fir" x="590" y="268"/><use href="#fir" x="616" y="264"/>
+          <use href="#fir" x="642" y="262"/><use href="#fir" x="668" y="264"/><use href="#fir" x="694" y="270"/>
+          <use href="#fir" x="720" y="274"/><use href="#fir" x="746" y="274"/><use href="#fir" x="772" y="270"/>
+          <use href="#fir" x="798" y="268"/>
+          </g><g opacity=".64">
+          <use href="#fir" x="265" y="312"/><use href="#fir" x="317" y="300"/><use href="#fir" x="369" y="304"/>
+          <use href="#fir" x="421" y="292"/><use href="#fir" x="473" y="286"/><use href="#fir" x="525" y="290"/>
+          <use href="#fir" x="577" y="286"/><use href="#fir" x="629" y="280"/><use href="#fir" x="681" y="284"/>
+          <use href="#fir" x="733" y="290"/><use href="#fir" x="785" y="286"/>
+        </g>
+        <g fill="#93a2b0" opacity=".85">
+          <path d="M 366 150 l 19 -11 17 13 -15 11 z"/><path d="M 404 160 l 15 -9 13 10 -12 9 z"/>
+          <path d="M 438 146 l 21 -12 18 14 -16 12 z"/><path d="M 478 138 l 16 -9 14 11 -13 9 z"/>
+          <path d="M 512 152 l 20 -11 17 13 -15 11 z"/><path d="M 552 164 l 15 -9 13 10 -12 9 z"/>
+          <path d="M 588 148 l 21 -12 18 14 -16 12 z"/><path d="M 628 142 l 16 -9 14 11 -13 9 z"/>
+          <path d="M 380 176 l 15 -9 13 10 -12 9 z"/><path d="M 462 172 l 17 -10 15 12 -14 10 z"/>
+          <path d="M 540 180 l 15 -9 13 10 -12 9 z"/><path d="M 606 174 l 17 -10 15 12 -14 10 z"/>
+          <path d="M 516 214 l 17 -10 15 12 -14 10 z"/><path d="M 518 242 l 15 -9 13 10 -12 9 z"/>
+          <path d="M 514 268 l 17 -10 15 12 -14 10 z"/>
+        </g>
+        </g><!-- /mask wrapper -->
+
         <g opacity=".62">
           <use href="#fir" x="196" y="486"/><use href="#fir" x="214" y="504"/><use href="#fir" x="180" y="512"/>
           <use href="#fir" x="232" y="478"/><use href="#fir" x="162" y="538"/><use href="#fir" x="200" y="546"/>
@@ -212,151 +326,136 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
           <use href="#asp" x="762" y="402"/><use href="#asp" x="780" y="418"/><use href="#asp" x="746" y="424"/>
         </g>
 
-        <!-- title block -->
         <text class="titleblk" x="36" y="52" font-size="17" font-weight="700" letter-spacing="3">MOUNT WERNER</text>
         <text class="titleblk" x="36" y="70" font-size="10" letter-spacing="2.2" opacity=".75">STEAMBOAT SPRINGS, COLORADO</text>
         <text class="titleblk" x="36" y="88" font-size="9.5" letter-spacing=".6" opacity=".6">Nine runs. Ski them in any order.</text>
 
         <!-- ================= LIFTS ================= -->
-        <g class="edge lift" data-edge="gondola" tabindex="0" role="button" aria-label="Ride the gondola to Thunderhead">
-          <path class="hit"  d="M 536 626 L 524 376"/>
+        <g class="edge lift" data-edge="gondola">
           <path class="line" d="M 536 626 L 524 376"/>
           <g class="bdg"><circle cx="530" cy="504" r="9.5"/><text x="530" y="507.5" text-anchor="middle">1</text></g>
         </g>
-        <g class="edge lift" data-edge="stormexp" tabindex="0" role="button" aria-label="Ride Storm Peak Express to Storm Peak">
-          <path class="hit"  d="M 486 350 L 368 226"/>
+        <g class="edge lift" data-edge="stormexp">
           <path class="line" d="M 486 350 L 368 226"/>
-          <g class="bdg"><circle cx="427" cy="288" r="9.5"/><text x="427" y="291.5" text-anchor="middle">2</text></g>
+          <g class="bdg"><circle cx="398" cy="254" r="9.5"/><text x="398" y="257.5" text-anchor="middle">2</text></g>
         </g>
-        <g class="edge lift" data-edge="sunshineexp" tabindex="0" role="button" aria-label="Ride Sunshine Express to Sunshine Peak">
-          <path class="hit"  d="M 520 348 L 698 242"/>
+        <g class="edge lift" data-edge="sunshineexp">
           <path class="line" d="M 520 348 L 698 242"/>
-          <g class="bdg"><circle cx="572" cy="317" r="9.5"/><text x="572" y="320.5" text-anchor="middle">3</text></g>
+          <g class="bdg"><circle cx="676" cy="255" r="9.5"/><text x="676" y="258.5" text-anchor="middle">3</text></g>
         </g>
-        <g class="edge lift" data-edge="traverse" tabindex="0" role="button" aria-label="Traverse to the summit">
-          <path class="hit"  d="M 346 202 C 378 158, 448 114, 506 90"/>
+        <g class="edge lift" data-edge="traverse">
           <path class="line" d="M 346 202 C 378 158, 448 114, 506 90"/>
-          <g class="bdg"><circle cx="414" cy="137" r="9.5"/><text x="414" y="140.5" text-anchor="middle">4</text></g>
+          <g class="bdg"><circle cx="486" cy="104" r="9.5"/><text x="486" y="107.5" text-anchor="middle">4</text></g>
         </g>
 
         <!-- ================= TRAILS ================= -->
-        <g class="edge black" data-edge="nonames" tabindex="0" role="button" aria-label="Ski No Names, double black diamond">
-          <path class="hit"  d="M 522 94 C 496 132, 440 172, 360 210"/>
+        <g class="edge black" data-edge="nonames">
           <path class="line" d="M 522 94 C 496 132, 440 172, 360 210"/>
           <g class="mk"><path d="M 546 96 l 6 7 -6 7 -6 -7 z"/><path d="M 559 96 l 6 7 -6 7 -6 -7 z"/></g>
           <text class="lbl" x="574" y="108">No Names</text>
         </g>
-
-        <g class="edge black" data-edge="concentration" tabindex="0" role="button" aria-label="Ski Concentration, black diamond">
-          <path class="hit"  d="M 358 220 C 386 260, 432 306, 496 354"/>
+        <g class="edge black" data-edge="concentration">
           <path class="line" d="M 358 220 C 386 260, 432 306, 496 354"/>
           <g class="mk"><path d="M 402 240 l 6 7 -6 7 -6 -7 z"/></g>
           <text class="lbl" x="418" y="252">Concentration</text>
         </g>
-
-        <g class="edge blue" data-edge="buddys" tabindex="0" role="button" aria-label="Ski Buddy's Run, blue square">
-          <path class="hit"  d="M 346 222 C 296 282, 290 342, 348 374 C 404 400, 462 386, 498 366"/>
+        <g class="edge blue" data-edge="buddys">
           <path class="line" d="M 346 222 C 296 282, 290 342, 348 374 C 404 400, 462 386, 498 366"/>
-          <g class="mk"><rect x="268" y="292" width="11" height="11"/></g>
-          <text class="lbl" x="262" y="302" text-anchor="end">Buddy&#8217;s Run</text>
+          <g class="mk"><rect x="288" y="342" width="11" height="11"/></g>
+          <text class="lbl" x="306" y="352">Buddy&#8217;s Run</text>
         </g>
-
-        <g class="edge black" data-edge="shadows" tabindex="0" role="button" aria-label="Ski Shadows, black diamond">
-          <path class="hit"  d="M 704 234 C 666 272, 606 314, 508 352"/>
+        <g class="edge black" data-edge="shadows">
           <path class="line" d="M 704 234 C 666 272, 606 314, 508 352"/>
           <g class="mk"><path d="M 726 246 l 6 7 -6 7 -6 -7 z"/></g>
           <text class="lbl" x="742" y="258">Shadows</text>
         </g>
-
-        <g class="edge black" data-edge="closets" tabindex="0" role="button" aria-label="Ski Closets, black diamond">
-          <path class="hit"  d="M 714 240 C 708 302, 632 350, 514 368"/>
+        <g class="edge black" data-edge="closets">
           <path class="line" d="M 714 240 C 708 302, 632 350, 514 368"/>
-          <g class="mk"><path d="M 730 300 l 6 7 -6 7 -6 -7 z"/></g>
-          <text class="lbl" x="746" y="312">Closets</text>
+          <g class="mk"><path d="M 630 342 l 6 7 -6 7 -6 -7 z"/></g>
+          <text class="lbl" x="648" y="352">Closets</text>
         </g>
-
-        <g class="edge blue" data-edge="tomahawk" tabindex="0" role="button" aria-label="Ski Tomahawk, blue square">
-          <path class="hit"  d="M 720 238 C 792 322, 822 462, 780 562 C 740 634, 600 652, 512 640"/>
+        <g class="edge blue" data-edge="tomahawk">
           <path class="line" d="M 720 238 C 792 322, 822 462, 780 562 C 740 634, 600 652, 512 640"/>
           <g class="mk"><rect x="806" y="512" width="11" height="11"/></g>
           <text class="lbl" x="824" y="522">Tomahawk</text>
         </g>
-
-        <g class="edge blue" data-edge="heavenly" tabindex="0" role="button" aria-label="Ski Heavenly Daze, blue square">
-          <path class="hit"  d="M 498 374 C 474 442, 470 522, 482 582 C 488 612, 494 626, 498 634"/>
+        <g class="edge blue" data-edge="heavenly">
           <path class="line" d="M 498 374 C 474 442, 470 522, 482 582 C 488 612, 494 626, 498 634"/>
-          <g class="mk"><rect x="452" y="462" width="11" height="11"/></g>
-          <text class="lbl" x="446" y="472" text-anchor="end">Heavenly Daze</text>
+          <g class="mk"><rect x="458" y="482" width="11" height="11"/></g>
+          <text class="lbl" x="452" y="492" text-anchor="end">Heavenly Daze</text>
         </g>
-
-        <g class="edge green" data-edge="whynot" tabindex="0" role="button" aria-label="Ski Why Not, green circle">
-          <path class="hit"  d="M 508 374 C 548 438, 586 502, 576 558 C 564 610, 524 632, 506 636"/>
+        <g class="edge green" data-edge="whynot">
           <path class="line" d="M 508 374 C 548 438, 586 502, 576 558 C 564 610, 524 632, 506 636"/>
           <g class="mk"><circle cx="598" cy="496" r="6"/></g>
           <text class="lbl" x="612" y="500">Why Not</text>
         </g>
-
-        <g class="edge green" data-edge="rightoway" tabindex="0" role="button" aria-label="Ski Right-O-Way, green circle">
-          <path class="hit"  d="M 492 372 C 432 422, 342 454, 308 522 C 288 576, 382 624, 488 638"/>
+        <g class="edge green" data-edge="rightoway">
           <path class="line" d="M 492 372 C 432 422, 342 454, 308 522 C 288 576, 382 624, 488 638"/>
-          <g class="mk"><circle cx="330" cy="430" r="6"/></g>
-          <text class="lbl" x="316" y="434" text-anchor="end">Right-O-Way</text>
+          <g class="mk"><circle cx="312" cy="524" r="6"/></g>
+          <text class="lbl" x="300" y="530" text-anchor="end">Right-O-Way</text>
         </g>
 
-        <!-- ================= NODES ================= -->
-        <circle class="node" id="n-summit"   cx="520" cy="86"  r="6"/>
-        <circle class="node" id="n-storm"    cx="354" cy="214" r="6"/>
-        <circle class="node" id="n-sunshine" cx="710" cy="228" r="6"/>
-        <circle class="node" id="n-thunder"  cx="502" cy="362" r="6"/>
-        <circle class="node" id="n-base"     cx="500" cy="636" r="6"/>
+        <!-- gates get injected here -->
+        <g id="gates"></g>
 
+        <!-- ================= PLACE MARKERS ================= -->
         <text class="peaklbl" x="520" y="62"  text-anchor="middle">Mount Werner</text>
         <text class="elevlbl" x="520" y="74"  text-anchor="middle">10,568&#8242;</text>
         <text class="peaklbl" x="330" y="196" text-anchor="end">Storm Peak</text>
         <text class="peaklbl" x="734" y="212" text-anchor="start">Sunshine Peak</text>
-        <text class="peaklbl" x="502" y="392" text-anchor="middle">Thunderhead</text>
+        <text class="peaklbl" x="502" y="378" text-anchor="middle">Thunderhead</text>
         <text class="peaklbl" x="500" y="662" text-anchor="middle">Base Area</text>
 
-        <!-- ================= LEGEND ================= -->
-        <g>
-          <rect class="legendbox" x="30" y="452" width="214" height="206" rx="4"/>
-          <text class="lgh" x="46" y="474">Difficulty</text>
-          <circle cx="52" cy="492" r="5.5" fill="var(--green)"/>
-          <text class="lgt" x="68" y="496">Easier</text>
-          <rect x="47" y="507" width="11" height="11" fill="var(--blue)"/>
-          <text class="lgt" x="68" y="517">More difficult</text>
-          <path d="M 52 528 l 6 7 -6 7 -6 -7 z" fill="var(--black)"/>
-          <text class="lgt" x="68" y="539">Most difficult</text>
-
-          <text class="lgh" x="46" y="568">Lifts</text>
-          <circle cx="52" cy="584" r="7.5" fill="#fff" stroke="var(--lift)" stroke-width="1.5"/>
-          <text x="52" y="587.5" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="var(--lift)">1</text>
-          <text class="lgt" x="68" y="588">Gondola</text>
-          <circle cx="52" cy="604" r="7.5" fill="#fff" stroke="var(--lift)" stroke-width="1.5"/>
-          <text x="52" y="607.5" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="var(--lift)">2</text>
-          <text class="lgt" x="68" y="608">Storm Peak Express</text>
-          <circle cx="52" cy="624" r="7.5" fill="#fff" stroke="var(--lift)" stroke-width="1.5"/>
-          <text x="52" y="627.5" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="var(--lift)">3</text>
-          <text class="lgt" x="68" y="628">Sunshine Express</text>
-          <circle cx="52" cy="644" r="7.5" fill="#fff" stroke="var(--lift)" stroke-width="1.5"/>
-          <text x="52" y="647.5" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="var(--lift)">4</text>
-          <text class="lgt" x="68" y="648">Summit traverse</text>
+        <!-- ================= SKIER ================= -->
+        <g id="skier">
+          <g stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none">
+            <path d="M -11 0 L 11 -1"/><path d="M -2 -1 L -3 -7"/><path d="M -3 -7 L 1 -13"/>
+            <path d="M 0 -10 L 7 -7"/><path d="M 8 -14 L 6 -1"/>
+          </g>
+          <g stroke="#14171c" stroke-width="2.4" stroke-linecap="round" fill="none">
+            <path d="M -11 0 L 11 -1"/><path d="M -2 -1 L -3 -7"/><path d="M -3 -7 L 1 -13"/>
+            <path d="M 0 -10 L 7 -7"/><path d="M 8 -14 L 6 -1"/>
+          </g>
+          <circle cx="2.5" cy="-16" r="3.4" fill="#14171c" stroke="#fff" stroke-width="1.6"/>
         </g>
 
-        <circle class="skier" id="skier" cx="500" cy="636" r="7.5"/>
+        <g id="bubble"><rect x="0" y="0" width="10" height="20"/><text x="0" y="0"></text></g>
       </svg>
     </div>
 
     <!-- ===================== HUD ===================== -->
     <aside class="hud">
-      <div class="where ui">You are at</div>
-      <div class="loc" id="loc">Base Area</div>
-      <div class="elev ui" id="elev">6,900&#8242;</div>
-      <div class="prompt ui" id="prompt">From here you can:</div>
-      <ul class="opts ui" id="opts"></ul>
+      <div class="where ui">Nearest</div>
+      <div class="loc" id="loc">Open slope</div>
+      <div class="sub ui" id="sub">Move with the arrow keys.</div>
+      <button class="go ui" id="go">Drop in</button>
+      <div class="keys ui">
+        <kbd>&larr;</kbd> <kbd>&uarr;</kbd> <kbd>&darr;</kbd> <kbd>&rarr;</kbd> to move &nbsp;·&nbsp; <kbd>Enter</kbd> at a gate
+      </div>
+      <div class="pad ui">
+        <button class="u" data-dir="up">&uarr;</button>
+        <button class="l" data-dir="left">&larr;</button>
+        <button class="k" data-dir="enter">GO</button>
+        <button class="r" data-dir="right">&rarr;</button>
+        <button class="d" data-dir="down">&darr;</button>
+      </div>
       <div class="card-count ui">
         <span id="count">0 of 9 runs skied</span>
         <div class="ticks" id="ticks"></div>
+      </div>
+
+      <div class="key ui">
+        <div class="kh">Difficulty</div>
+        <div class="kr"><i class="chip green"></i> Easier</div>
+        <div class="kr"><i class="chip blue"></i> More difficult</div>
+        <div class="kr"><i class="chip black"></i> Most difficult</div>
+        <div class="kh">Lifts</div>
+        <div class="kr"><i class="liftmk">1</i> Gondola</div>
+        <div class="kr"><i class="liftmk">2</i> Storm Peak Express</div>
+        <div class="kr"><i class="liftmk">3</i> Sunshine Express</div>
+        <div class="kr"><i class="liftmk">4</i> Summit traverse</div>
+        <div class="kh">Terrain</div>
+        <div class="kr"><i class="timber"></i> Timber &amp; cliff &mdash; ride a lift</div>
       </div>
     </aside>
 
@@ -383,7 +482,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
     </section>
     <section class="beat">
       <h3>Introduction to depth</h3>
-      <p>In high school I watched closey as the company neared financial distress; revenue problems, spending that had not been sustainable, and short-term borrowing to fund operations becoming nearly impossible almost overnight.</p>
+      <p>In high school I watched closely as the company neared financial distress; revenue problems, spending that had not been sustainable, and short-term borrowing to fund operations becoming nearly impossible almost overnight.</p>
       <p>This introduced me to the depth and complexity of finance, something that I knew I wanted to build on going into college.</p>
     </section>
   </div>
@@ -418,18 +517,18 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
     </section>
     <section class="beat">
       <h3>Current Projects</h3>
-      <p>I am on a team building a buy pitch for Hubbell. Our main thesis revolves around utility based demand growing under structural demand drivers and recent portfolio discipline-based divestures and acquisitions.</p>
+      <p>I am on a team building a buy pitch for Hubbell. Our main thesis revolves around utility based demand growing under structural demand drivers and recent portfolio discipline-based divestitures and acquisitions.</p>
     </section>
   </div>
 
   <div class="src" id="src-concentration" data-cap="One of the first trails ever cut on this mountain.">
     <section class="beat">
-      <h3>BC Invsetment Club General Member Stock Pitch Competition</h3>
+      <h3>BC Investment Club General Member Stock Pitch Competition</h3>
       <p>I pitched Generac, a back-up generator manufacturer with significant residential and commercial/industrial applications. My argument was that weather-driven cyclicality was overshadowing aging grid infrastructure and rising instability &mdash; a structural demand driver the market was treating as a one-off.</p>
     </section>
     <section class="beat">
       <h3>What it taught me</h3>
-      <p>Every qualitative claim had to be quantifiable and defensible. Each thesis point needed a specific growth rate or margin over a specified horizon, or it wouldn't hold up under pressure. The analytical pressure that applies is something that attracted me to the process the most.</p>
+      <p>Every qualitative claim had to be quantifiable and defensible. Each thesis point needed a specific growth rate or margin over a specified horizon, or it wouldn&#8217;t hold up under pressure. The analytical pressure that applies is something that attracted me to the process the most.</p>
       <p>I placed first out of more than 150 competitors and became an analyst as a result.</p>
     </section>
   </div>
@@ -441,7 +540,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
     </section>
     <section class="beat">
       <h3>Reading past the task</h3>
-      <p>The job was mostly document retrieval, but oftentimes I would read the some of the filings themselves. For example, sometimes I would go into a conversion order to understand why a company had moved from Chapter 11 to Chapter 7, when the actual required task was just to record that it had.</p>
+      <p>The job was mostly document retrieval, but oftentimes I would read some of the filings themselves. For example, sometimes I would go into a conversion order to understand why a company had moved from Chapter 11 to Chapter 7, when the actual required task was just to record that it had.</p>
     </section>
   </div>
 
@@ -457,7 +556,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
     <section class="beat">
       <h3>What I am following now</h3>
       <p>MultiColor, a prime label manufacturer that went through a prepackaged Chapter 11 after cost inflation, industry destocking, and unsustainable leverage.</p>
-      <p>One thing in particular I learned was how central valuation can be to these kinds of deals, as Evercore's valuation of first lien collateral was the difference between an identical claim recovering ~90 cents vs. ~3 cents.</p>
+      <p>One thing in particular I learned was how central valuation can be to these kinds of deals, as Evercore&#8217;s valuation of first lien collateral was the difference between an identical claim recovering ~90 cents vs. ~3 cents.</p>
     </section>
   </div>
 
@@ -476,71 +575,137 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
 
 <script>
 (function(){
+  var SVG    = document.getElementById('map'),
+      MASSIF = document.getElementById('massif'),
+      GATES  = document.getElementById('gates'),
+      skier  = document.getElementById('skier'),
+      bubble = document.getElementById('bubble'),
+      bRect  = bubble.querySelector('rect'),
+      bText  = bubble.querySelector('text'),
+      loc    = document.getElementById('loc'),
+      sub    = document.getElementById('sub'),
+      goBtn  = document.getElementById('go'),
+      count  = document.getElementById('count'),
+      ticks  = document.getElementById('ticks'),
+      sheet  = document.getElementById('sheet'),
+      sheetIn= document.getElementById('sheet-in'),
+      scrim  = document.getElementById('scrim');
+
   var NODES = {
-    base:     {name:'Base Area',     elev:'6,900\u2032'},
-    thunder:  {name:'Thunderhead',   elev:'9,080\u2032'},
-    storm:    {name:'Storm Peak',    elev:'10,372\u2032'},
-    sunshine: {name:'Sunshine Peak', elev:'9,530\u2032'},
-    summit:   {name:'Mount Werner',  elev:'10,568\u2032'}
+    base:{name:'Base Area'}, thunder:{name:'Thunderhead'}, storm:{name:'Storm Peak'},
+    sunshine:{name:'Sunshine Peak'}, summit:{name:'Mount Werner'}
   };
 
   var EDGES = {
-    gondola:     {from:'base',    to:'thunder',  lift:'Gondola',            no:1, kind:'lift'},
-    stormexp:    {from:'thunder', to:'storm',    lift:'Storm Peak Express', no:2, kind:'lift'},
-    sunshineexp: {from:'thunder', to:'sunshine', lift:'Sunshine Express',   no:3, kind:'lift'},
-    traverse:    {from:'storm',   to:'summit',   lift:'Summit traverse',    no:4, kind:'lift'},
+    gondola:     {kind:'lift', no:1, name:'Gondola',            to:'thunder'},
+    stormexp:    {kind:'lift', no:2, name:'Storm Peak Express', to:'storm'},
+    sunshineexp: {kind:'lift', no:3, name:'Sunshine Express',   to:'sunshine'},
+    traverse:    {kind:'lift', no:4, name:'Summit traverse',    to:'summit'},
 
-    nonames:       {from:'summit',   to:'storm',   name:'No Names',         diff:'black', label:'Double black diamond'},
-    concentration: {from:'storm',    to:'thunder', name:'Concentration',    diff:'black', label:'Black diamond'},
-    buddys:        {from:'storm',    to:'thunder', name:'Buddy\u2019s Run', diff:'blue',  label:'Blue square'},
-    shadows:       {from:'sunshine', to:'thunder', name:'Shadows',          diff:'black', label:'Black diamond'},
-    closets:       {from:'sunshine', to:'thunder', name:'Closets',          diff:'black', label:'Black diamond'},
-    tomahawk:      {from:'sunshine', to:'base',    name:'Tomahawk',         diff:'blue',  label:'Blue square'},
-    heavenly:      {from:'thunder',  to:'base',    name:'Heavenly Daze',    diff:'blue',  label:'Blue square'},
-    whynot:        {from:'thunder',  to:'base',    name:'Why Not',          diff:'green', label:'Green circle'},
-    rightoway:     {from:'thunder',  to:'base',    name:'Right-O-Way',      diff:'green', label:'Green circle'}
+    nonames:       {name:'No Names',      diff:'black', label:'Double black diamond', to:'storm'},
+    concentration: {name:'Concentration', diff:'black', label:'Black diamond',        to:'thunder'},
+    buddys:        {name:'Buddy\u2019s Run', diff:'blue', label:'Blue square',        to:'thunder'},
+    shadows:       {name:'Shadows',       diff:'black', label:'Black diamond',        to:'thunder'},
+    closets:       {name:'Closets',       diff:'black', label:'Black diamond',        to:'thunder'},
+    tomahawk:      {name:'Tomahawk',      diff:'blue',  label:'Blue square',          to:'base'},
+    heavenly:      {name:'Heavenly Daze', diff:'blue',  label:'Blue square',          to:'base'},
+    whynot:        {name:'Why Not',       diff:'green', label:'Green circle',         to:'base'},
+    rightoway:     {name:'Right-O-Way',   diff:'green', label:'Green circle',         to:'base'}
   };
 
-  var TRAILS = Object.keys(EDGES).filter(function(k){ return !EDGES[k].kind; });
-  var at = 'base', skied = {}, moving = false;
+  /* which end of each drawn path is the entry (the uphill end for trails,
+     the bottom for lifts) — true means the entry is at length 0 */
+  var ENTRY_AT_START = {
+    gondola:true, stormexp:true, sunshineexp:true, traverse:true,
+    nonames:true, concentration:true, buddys:true, shadows:true, closets:true,
+    tomahawk:true, heavenly:true, whynot:true, rightoway:true
+  };
 
-  var skier = document.getElementById('skier'), loc = document.getElementById('loc'),
-      elev = document.getElementById('elev'), prompt = document.getElementById('prompt'),
-      opts = document.getElementById('opts'), count = document.getElementById('count'),
-      ticks = document.getElementById('ticks'), sheet = document.getElementById('sheet'),
-      sheetIn = document.getElementById('sheet-in'), scrim = document.getElementById('scrim');
+  var IDS = Object.keys(EDGES),
+      TRAILS = IDS.filter(function(i){ return !EDGES[i].kind; }),
+      skied = {}, moving = false, near = null,
+      px = 500, py = 630, facing = 1,
+      keys = {};
 
-  function el(id){ return document.querySelector('[data-edge="' + id + '"]'); }
-  function pathOf(id){ return el(id).querySelector('.line'); }
+  function g(id){ return document.querySelector('[data-edge="' + id + '"]'); }
+  function line(id){ return g(id).querySelector('.line'); }
 
-  function render(){
-    loc.textContent = NODES[at].name;
-    elev.textContent = NODES[at].elev;
+  /* ---------- build gates ---------- */
+  IDS.forEach(function(id){
+    var p = line(id), L = p.getTotalLength(),
+        pt = p.getPointAtLength(ENTRY_AT_START[id] ? 0 : L);
+    EDGES[id].x = pt.x; EDGES[id].y = pt.y;
+    var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y);
+    c.setAttribute('r', 7); c.setAttribute('class','gate');
+    c.setAttribute('data-gate', id);
+    GATES.appendChild(c);
+    EDGES[id].gate = c;
+  });
 
-    Object.keys(EDGES).forEach(function(id){
-      var e = EDGES[id], g = el(id);
-      g.classList.toggle('open', e.from === at && !moving);
-      g.classList.toggle('done', !!skied[id]);
-      g.setAttribute('tabindex', e.from === at ? '0' : '-1');
+  /* ---------- geometry ---------- */
+  var pt = SVG.createSVGPoint();
+  var BARRIERS = [].slice.call(document.querySelectorAll('.barrier'));
+
+  function inside(x, y){
+    pt.x = x; pt.y = y;
+    var ok;
+    try { ok = MASSIF.isPointInFill(pt); } catch(e){ ok = true; }
+    if(!ok) return false;
+    for(var i = 0; i < BARRIERS.length; i++){
+      try { if(BARRIERS[i].isPointInFill(pt)) return false; } catch(e){}
+    }
+    return true;
+  }
+
+  function place(){
+    skier.setAttribute('transform','translate(' + px + ',' + py + ') scale(' + facing + ',1)');
+  }
+
+  function nearest(){
+    var best = null, bd = 30;
+    IDS.forEach(function(id){
+      var e = EDGES[id], d = Math.hypot(e.x - px, e.y - py);
+      if(d < bd){ bd = d; best = id; }
+    });
+    if(best !== near){ near = best; paint(); }
+  }
+
+  function paint(){
+    IDS.forEach(function(id){
+      g(id).classList.toggle('near', id === near);
+      g(id).classList.toggle('done', !!skied[id]);
+      EDGES[id].gate.classList.toggle('hot', id === near);
+      EDGES[id].gate.classList.toggle('done', !!skied[id]);
     });
 
-    document.querySelectorAll('.node').forEach(function(n){ n.classList.remove('here'); });
-    document.getElementById('n-' + at).classList.add('here');
+    if(near){
+      var e = EDGES[near];
+      loc.innerHTML = (e.kind === 'lift' ? e.name
+        : '<i class="chip ' + e.diff + '"></i> ' + e.name);
+      sub.textContent = e.kind === 'lift'
+        ? 'Ride up to ' + NODES[e.to].name + '.'
+        : (skied[near] ? 'Already skied — take it again?' : e.label + '. Comes out at ' + NODES[e.to].name + '.');
+      goBtn.textContent = e.kind === 'lift' ? 'Ride up' : 'Drop in';
+      goBtn.classList.add('on');
 
-    opts.innerHTML = '';
-    Object.keys(EDGES).filter(function(id){ return EDGES[id].from === at; }).forEach(function(id){
-      var e = EDGES[id], li = document.createElement('li'), b = document.createElement('button');
-      if(e.kind === 'lift'){
-        b.innerHTML = '<i class="liftmk">' + e.no + '</i><span>' + e.lift + '</span>' +
-                      '<span class="kind">to ' + NODES[e.to].name + '</span>';
-      } else {
-        b.innerHTML = '<i class="chip ' + e.diff + '"></i><span>' + e.name + '</span>' +
-                      '<span class="kind">' + (skied[id] ? 'skied' : 'ski it') + '</span>';
-        if(skied[id]) b.className = 'skied';
-      }
-      b.addEventListener('click', function(){ take(id); });
-      li.appendChild(b); opts.appendChild(li);
-    });
+      var txt = (e.kind === 'lift' ? 'Ride ' : 'Ski ') + e.name;
+      bText.textContent = txt;
+      var w = txt.length * 6.1 + 18;
+      bRect.setAttribute('width', w);
+      bRect.setAttribute('height', 20);
+      bRect.setAttribute('x', e.x - w/2);
+      bRect.setAttribute('y', e.y - 42);
+      bText.setAttribute('x', e.x);
+      bText.setAttribute('y', e.y - 28);
+      bText.setAttribute('text-anchor','middle');
+      bubble.classList.add('on');
+    } else {
+      loc.textContent = 'Open slope';
+      sub.textContent = 'Move to a gate to ride a lift or drop into a run.';
+      goBtn.classList.remove('on');
+      bubble.classList.remove('on');
+    }
 
     var n = TRAILS.filter(function(t){ return skied[t]; }).length;
     count.textContent = n + ' of ' + TRAILS.length + ' runs skied';
@@ -550,38 +715,38 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
       d.className = 'tick' + (skied[t] ? ' on' : '');
       ticks.appendChild(d);
     });
-    prompt.textContent = (n === TRAILS.length)
-      ? 'You\u2019ve skied the whole mountain. Take another lap if you like.'
-      : 'From here you can:';
   }
 
+  /* ---------- travel ---------- */
   function take(id){
-    if(moving) return;
-    var e = EDGES[id], p = pathOf(id), len = p.getTotalLength(),
-        hx = skier.getAttribute('cx') * 1, hy = skier.getAttribute('cy') * 1,
-        a = p.getPointAtLength(0), z = p.getPointAtLength(len),
-        rev = Math.hypot(a.x - hx, a.y - hy) > Math.hypot(z.x - hx, z.y - hy),
-        t0 = null, dur = e.kind === 'lift' ? 1100 : 1500;
-
+    if(moving || !id) return;
+    var e = EDGES[id], p = line(id), L = p.getTotalLength(),
+        fwd = ENTRY_AT_START[id], t0 = null,
+        dur = e.kind === 'lift' ? 1200 : 1600;
     moving = true;
-    Object.keys(EDGES).forEach(function(k){ el(k).classList.remove('open'); });
+    bubble.classList.remove('on');
+    goBtn.classList.remove('on');
 
     function step(ts){
       if(!t0) t0 = ts;
       var k = Math.min(1, (ts - t0) / dur),
           ease = k < .5 ? 2*k*k : 1 - Math.pow(-2*k + 2, 2)/2,
-          pt = p.getPointAtLength(len * (rev ? 1 - ease : ease));
-      skier.setAttribute('cx', pt.x); skier.setAttribute('cy', pt.y);
+          q = p.getPointAtLength(L * (fwd ? ease : 1 - ease)),
+          prev = px;
+      px = q.x; py = q.y;
+      if(Math.abs(px - prev) > .4) facing = px > prev ? 1 : -1;
+      place();
       if(k < 1) requestAnimationFrame(step);
       else {
-        moving = false; at = e.to;
+        moving = false;
         if(e.kind !== 'lift'){ skied[id] = true; openSheet(id); }
-        render();
+        near = null; nearest(); paint();
       }
     }
     requestAnimationFrame(step);
   }
 
+  /* ---------- sheet ---------- */
   function openSheet(id){
     var e = EDGES[id], src = document.getElementById('src-' + id),
         dbl = e.label.indexOf('Double') === 0;
@@ -592,24 +757,76 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
       '<p class="cap">' + (src ? src.getAttribute('data-cap') : '') + '</p>' +
       (src ? src.innerHTML : '') +
       '<div class="arrive">You come out at ' + NODES[e.to].name + '.' +
-      '<br><button id="ride">Back to the map</button></div>';
+      '<br><button id="ride">Back to the mountain</button></div>';
     sheet.classList.add('on'); scrim.classList.add('on'); sheet.scrollTop = 0;
     document.getElementById('ride').addEventListener('click', closeSheet);
   }
   function closeSheet(){ sheet.classList.remove('on'); scrim.classList.remove('on'); }
+  function sheetOpen(){ return sheet.classList.contains('on'); }
 
-  Object.keys(EDGES).forEach(function(id){
-    var g = el(id);
-    g.addEventListener('click', function(){ if(EDGES[id].from === at) take(id); });
-    g.addEventListener('keydown', function(ev){
-      if((ev.key === 'Enter' || ev.key === ' ') && EDGES[id].from === at){ ev.preventDefault(); take(id); }
-    });
+  /* ---------- input ---------- */
+  var MAP = {ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',
+             a:'left',d:'right',w:'up',s:'down',
+             A:'left',D:'right',W:'up',S:'down'};
+
+  /* keyboard needs focus — grab it on load and whenever the map is touched */
+  var card = document.getElementById('mapcard'), hint = document.getElementById('hint');
+  function grab(){
+    card.focus({preventScroll:true});
+    hint.classList.add('off');
+  }
+  card.addEventListener('mousedown', grab);
+  card.addEventListener('touchstart', grab, {passive:true});
+  hint.addEventListener('click', grab);
+  window.addEventListener('load', function(){ try{ grab(); }catch(e){} });
+  setTimeout(function(){ try{ card.focus({preventScroll:true}); }catch(e){} }, 60);
+
+  window.addEventListener('keydown', function(ev){
+    if(ev.key === 'Escape'){ closeSheet(); return; }
+    if(sheetOpen()) return;
+    if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); take(near); return; }
+    var k = MAP[ev.key];
+    if(k){ ev.preventDefault(); keys[k] = true; hint.classList.add('off'); }
   });
+  window.addEventListener('keyup', function(ev){
+    var k = MAP[ev.key];
+    if(k) keys[k] = false;
+  });
+  window.addEventListener('blur', function(){ keys = {}; });
+
+  document.querySelectorAll('.pad button').forEach(function(b){
+    var dir = b.getAttribute('data-dir');
+    function on(e){ e.preventDefault(); if(dir === 'enter') take(near); else keys[dir] = true; }
+    function off(){ if(dir !== 'enter') keys[dir] = false; }
+    b.addEventListener('touchstart', on, {passive:false});
+    b.addEventListener('touchend', off);
+    b.addEventListener('mousedown', on);
+    b.addEventListener('mouseup', off);
+    b.addEventListener('mouseleave', off);
+  });
+
+  goBtn.addEventListener('click', function(){ take(near); });
   scrim.addEventListener('click', closeSheet);
   document.getElementById('closer').addEventListener('click', closeSheet);
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeSheet(); });
 
-  render();
+  /* ---------- loop ---------- */
+  function loop(){
+    if(!moving && !sheetOpen()){
+      var dx = (keys.right ? 1 : 0) - (keys.left ? 1 : 0),
+          dy = (keys.down ? 1 : 0) - (keys.up ? 1 : 0);
+      if(dx || dy){
+        var m = Math.hypot(dx, dy), sp = 3.6,
+            nx = px + dx / m * sp, ny = py + dy / m * sp;
+        if(inside(nx, py)) px = nx;
+        if(inside(px, ny)) py = ny;
+        if(dx) facing = dx > 0 ? 1 : -1;
+        place(); nearest();
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  place(); paint(); loop();
 })();
 </script>
 </body>
