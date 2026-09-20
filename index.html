@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evan Witter</title>
+<style>
+:root{
+  --ink:#14171c; --soft:#5d646d; --rule:#dce2e9; --paper:#eef4fa; --panel:#fff;
+  --green:#18884a; --blue:#1f5fa8; --black:#14171c;
+  --snow-hi:#fff; --snow-lo:#d7e4f0; --rock:#b4c3d1; --tree:#4a6a55; --lift:#7c8794;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
+.ui{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+
+.mast{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;
+  padding-bottom:14px;border-bottom:1px solid var(--rule);margin-bottom:18px}
+.mast h1{margin:0 0 2px;font-size:27px;font-weight:600;letter-spacing:-.01em}
+.mast p{margin:0;font-size:14px;color:var(--soft)}
+.mast a{color:var(--soft);font-size:14px}
+.lede{max-width:660px;margin:0 0 20px;font-size:16.5px}
+
+/* ---------------- stage ---------------- */
+.stage{display:grid;grid-template-columns:1fr 300px;gap:26px;align-items:start}
+
+.map-card{background:linear-gradient(#fff,#e4eef7);border:1px solid var(--rule);
+  border-radius:5px;padding:6px 6px 0;position:relative;overflow:hidden}
+svg{display:block;width:100%;height:auto}
+
+/* trails */
+.edge .hit{fill:none;stroke:transparent;stroke-width:26;stroke-linecap:round}
+.edge .line{fill:none;stroke-width:3.4;stroke-linecap:round;transition:stroke-width .15s,opacity .3s}
+.edge .lbl{font-family:system-ui,sans-serif;font-size:11px;fill:var(--ink);
+  paint-order:stroke;stroke:#fff;stroke-width:3.4px;stroke-linejoin:round;transition:opacity .3s}
+.edge.green .line{stroke:var(--green)} .edge.green .mk{fill:var(--green)}
+.edge.blue  .line{stroke:var(--blue)}  .edge.blue  .mk{fill:var(--blue)}
+.edge.black .line{stroke:var(--black)} .edge.black .mk{fill:var(--black)}
+.edge.lift .line{stroke:var(--lift);stroke-width:1.4;stroke-dasharray:6 5}
+.edge.lift .lbl{font-size:9.5px;fill:var(--lift);letter-spacing:.08em}
+
+.edge{opacity:.22;pointer-events:none;transition:opacity .3s}
+.edge.open{opacity:1;pointer-events:auto;cursor:pointer}
+.edge.done{opacity:.5}
+.edge.done .line{stroke-dasharray:2 5}
+.edge.open:hover .line{stroke-width:6.5}
+.edge.open:hover .lbl{fill:#000}
+.edge.lift.open:hover .line{stroke-width:3}
+.edge:focus{outline:none}
+.edge.open:focus .line{stroke-width:6.5}
+
+.node{fill:#fff;stroke:var(--rock);stroke-width:2}
+.node.here{stroke:var(--ink);stroke-width:3}
+.peaklbl{font-family:system-ui,sans-serif;font-size:10.5px;fill:#68727e;
+  letter-spacing:.09em;text-transform:uppercase}
+.skier{fill:#14171c;stroke:#fff;stroke-width:2.5}
+.pulse{fill:none;stroke:var(--ink);stroke-width:2;opacity:0}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;padding:11px 8px;font-size:12.5px;
+  color:var(--soft);border-top:1px solid var(--rule);margin-top:4px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.chip{width:10px;height:10px;display:inline-block;flex:none}
+.chip.green{background:var(--green);border-radius:50%}
+.chip.blue{background:var(--blue)}
+.chip.black{background:var(--black);transform:rotate(45deg)}
+
+/* ---------------- HUD ---------------- */
+.hud{background:var(--panel);border:1px solid var(--rule);border-radius:5px;
+  padding:18px 18px 8px;position:sticky;top:18px}
+.hud .where{font-family:system-ui,sans-serif;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--soft);margin-bottom:3px}
+.hud .loc{font-size:20px;font-weight:600;margin-bottom:2px}
+.hud .elev{font-family:system-ui,sans-serif;font-size:13px;color:var(--soft);margin-bottom:14px}
+.hud .prompt{font-family:system-ui,sans-serif;font-size:13.5px;color:var(--soft);
+  border-top:1px solid var(--rule);padding-top:12px;margin-bottom:10px}
+.opts{list-style:none;margin:0 0 12px;padding:0}
+.opts li{margin-bottom:2px}
+.opts button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;
+  background:none;border:0;border-radius:3px;padding:8px 7px;cursor:pointer;
+  font-family:system-ui,sans-serif;font-size:14.5px;color:var(--ink)}
+.opts button:hover{background:#eef4fa}
+.opts button .kind{margin-left:auto;font-size:11.5px;color:var(--soft)}
+.opts button.skied{color:var(--soft)}
+.card-count{font-family:system-ui,sans-serif;font-size:12px;color:var(--soft);
+  border-top:1px solid var(--rule);padding:11px 0;margin-top:4px}
+.ticks{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
+.tick{width:14px;height:5px;background:var(--rule);border-radius:2px}
+.tick.on{background:var(--ink)}
+
+/* ---------------- content sheet ---------------- */
+.scrim{position:fixed;inset:0;background:rgba(14,23,32,.42);opacity:0;pointer-events:none;
+  transition:opacity .25s;z-index:40}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;top:0;right:0;height:100%;width:min(540px,92vw);background:var(--panel);
+  z-index:50;transform:translateX(102%);transition:transform .34s cubic-bezier(.3,.7,.3,1);
+  overflow-y:auto;box-shadow:-14px 0 40px rgba(10,20,30,.13)}
+.sheet.on{transform:translateX(0)}
+.sheet-in{padding:30px 34px 60px}
+.sheet .sign{display:inline-flex;align-items:center;gap:8px;font-family:system-ui,sans-serif;
+  font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--soft);margin-bottom:9px}
+.sheet h2{font-size:26px;margin:0 0 4px;font-weight:600;letter-spacing:-.01em}
+.sheet .cap{font-family:system-ui,sans-serif;font-size:13.5px;color:var(--soft);margin:0 0 24px}
+.sheet h3{font-size:19px;margin:28px 0 8px;font-weight:600}
+.sheet p{margin:0 0 17px}
+.sheet .beat:first-child h3{margin-top:0}
+.closer{position:absolute;top:16px;right:18px;background:none;border:0;cursor:pointer;
+  font-family:system-ui,sans-serif;font-size:13px;color:var(--soft)}
+.closer:hover{color:var(--ink)}
+.arrive{margin-top:32px;padding-top:20px;border-top:1px solid var(--rule);
+  font-family:system-ui,sans-serif;font-size:14px;color:var(--soft)}
+.arrive button{background:none;border:1px solid var(--rule);border-radius:3px;
+  font-family:system-ui,sans-serif;font-size:14px;padding:9px 15px;margin-top:11px;
+  cursor:pointer;color:var(--ink)}
+.arrive button:hover{border-color:var(--ink)}
+
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
+  font-family:system-ui,sans-serif;font-size:13.5px;color:var(--soft)}
+
+@media (max-width:900px){
+  .stage{grid-template-columns:1fr;gap:16px}
+  .hud{position:static}
+  .edge .lbl{font-size:14px;stroke-width:4.5px}
+  .edge.lift .lbl{font-size:12px}
+  .peaklbl{font-size:12.5px}
+  .sheet{width:100%;top:auto;bottom:0;height:88%;transform:translateY(102%);
+    border-radius:12px 12px 0 0}
+  .sheet.on{transform:translateY(0)}
+  .sheet-in{padding:26px 22px 50px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div>
+      <h1>Evan Witter</h1>
+      <p class="ui">Sophomore at Boston College &middot; Finance major, Philosophy minor</p>
+    </div>
+    <a class="ui" href="mailto:wittere@bc.edu">wittere@bc.edu</a>
+  </header>
+
+  <p class="lede">I grew up skiing Steamboat, so I built this site as the mountain. You start at the base and you can only ski what actually leaves from where you&#8217;re standing &mdash; ride a lift up, pick a run, and you&#8217;ll get a piece of how I ended up pointed at investment banking. Nine runs. Ski them in whatever order you like.</p>
+
+  <div class="stage">
+
+    <!-- ================= MAP ================= -->
+    <div class="map-card">
+      <svg id="map" viewBox="0 0 900 690" role="img" aria-label="Interactive trail map of Mount Werner">
+        <defs>
+          <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--snow-hi)"/>
+            <stop offset="58%" stop-color="#e9f2fa"/>
+            <stop offset="100%" stop-color="var(--snow-lo)"/>
+          </linearGradient>
+          <g id="fir"><path d="M0 0 l5 13 -10 0 z" fill="var(--tree)" opacity=".5"/></g>
+        </defs>
+
+        <path d="M 26 628 L 132 452 L 226 350 L 312 206 L 388 124 L 462 54 L 540 134 L 618 206 L 706 318 L 800 456 L 872 628 Z"
+              fill="url(#face)" stroke="var(--rock)" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M 462 54 L 540 134 L 618 206 L 706 318 L 800 456 L 872 628 L 462 628 Z" fill="#0b2545" opacity=".04"/>
+        <path d="M 96 520 Q 300 470 462 470 Q 650 470 812 526" fill="none" stroke="var(--rock)" stroke-width=".8" opacity=".45"/>
+        <path d="M 170 420 Q 330 372 462 372 Q 610 372 742 424" fill="none" stroke="var(--rock)" stroke-width=".8" opacity=".45"/>
+        <path d="M 262 300 Q 370 262 462 262 Q 560 262 664 302" fill="none" stroke="var(--rock)" stroke-width=".8" opacity=".45"/>
+
+        <g>
+          <use href="#fir" x="214" y="474"/><use href="#fir" x="230" y="490"/><use href="#fir" x="200" y="498"/>
+          <use href="#fir" x="182" y="522"/><use href="#fir" x="246" y="466"/>
+          <use href="#fir" x="596" y="402"/><use href="#fir" x="614" y="420"/><use href="#fir" x="580" y="428"/>
+          <use href="#fir" x="632" y="396"/><use href="#fir" x="650" y="434"/><use href="#fir" x="608" y="452"/>
+          <use href="#fir" x="676" y="456"/><use href="#fir" x="694" y="482"/><use href="#fir" x="658" y="490"/>
+          <use href="#fir" x="370" y="544"/><use href="#fir" x="388" y="560"/><use href="#fir" x="352" y="566"/>
+          <use href="#fir" x="288" y="348"/><use href="#fir" x="304" y="366"/><use href="#fir" x="272" y="372"/>
+          <use href="#fir" x="516" y="296"/><use href="#fir" x="532" y="314"/><use href="#fir" x="500" y="320"/>
+        </g>
+
+        <!-- ============ LIFTS ============ -->
+        <g class="edge lift" data-edge="gondola" tabindex="0" role="button" aria-label="Ride the gondola to Thunderhead">
+          <path class="hit"  d="M 470 606 L 464 334"/>
+          <path class="line" d="M 470 606 L 464 334"/>
+          <text class="lbl" x="476" y="486">GONDOLA</text>
+        </g>
+        <g class="edge lift" data-edge="stormexp" tabindex="0" role="button" aria-label="Ride Storm Peak Express">
+          <path class="hit"  d="M 444 320 L 354 224"/>
+          <path class="line" d="M 444 320 L 354 224"/>
+          <text class="lbl" x="366" y="258" transform="rotate(-46 366 258)">STORM PEAK EXPRESS</text>
+        </g>
+        <g class="edge lift" data-edge="sunshineexp" tabindex="0" role="button" aria-label="Ride Sunshine Express">
+          <path class="hit"  d="M 468 320 L 640 226"/>
+          <path class="line" d="M 468 320 L 640 226"/>
+          <text class="lbl" x="500" y="292" transform="rotate(-29 500 292)">SUNSHINE EXPRESS</text>
+        </g>
+        <g class="edge lift" data-edge="traverse" tabindex="0" role="button" aria-label="Traverse to the summit">
+          <path class="hit"  d="M 340 206 C 370 158, 424 116, 458 84"/>
+          <path class="line" d="M 340 206 C 370 158, 424 116, 458 84"/>
+          <text class="lbl" x="346" y="146" transform="rotate(-42 346 146)">SUMMIT TRAVERSE</text>
+        </g>
+
+        <!-- ============ TRAILS ============ -->
+        <g class="edge black" data-edge="nonames" tabindex="0" role="button" aria-label="Ski No Names, double black">
+          <path class="hit"  d="M 474 84 C 452 128, 404 166, 352 212"/>
+          <path class="line" d="M 474 84 C 452 128, 404 166, 352 212"/>
+          <g class="mk"><path d="M 488 82 l 6 7 -6 7 -6 -7 z"/><path d="M 501 82 l 6 7 -6 7 -6 -7 z"/></g>
+          <text class="lbl" x="514" y="94">No Names</text>
+        </g>
+
+        <g class="edge black" data-edge="concentration" tabindex="0" role="button" aria-label="Ski Concentration, black diamond">
+          <path class="hit"  d="M 350 222 C 372 260, 406 292, 448 322"/>
+          <path class="line" d="M 350 222 C 372 260, 406 292, 448 322"/>
+          <g class="mk"><path d="M 386 262 l 6 7 -6 7 -6 -7 z"/></g>
+          <text class="lbl" x="398" y="276">Concentration</text>
+        </g>
+
+        <g class="edge blue" data-edge="buddys" tabindex="0" role="button" aria-label="Ski Buddy's Run, blue square">
+          <path class="hit"  d="M 338 224 C 306 284, 350 322, 444 330"/>
+          <path class="line" d="M 338 224 C 306 284, 350 322, 444 330"/>
+          <g class="mk"><rect x="312" y="278" width="11" height="11"/></g>
+          <text class="lbl" x="232" y="290">Buddy&#8217;s Run</text>
+        </g>
+
+        <g class="edge black" data-edge="shadows" tabindex="0" role="button" aria-label="Ski Shadows, black diamond">
+          <path class="hit"  d="M 644 224 C 614 266, 550 302, 466 322"/>
+          <path class="line" d="M 644 224 C 614 266, 550 302, 466 322"/>
+          <g class="mk"><path d="M 584 272 l 6 7 -6 7 -6 -7 z"/></g>
+          <text class="lbl" x="596" y="286">Shadows</text>
+        </g>
+
+        <g class="edge black" data-edge="closets" tabindex="0" role="button" aria-label="Ski Closets, black diamond">
+          <path class="hit"  d="M 654 230 C 652 296, 566 336, 470 336"/>
+          <path class="line" d="M 654 230 C 652 296, 566 336, 470 336"/>
+          <g class="mk"><path d="M 640 300 l 6 7 -6 7 -6 -7 z"/></g>
+          <text class="lbl" x="654" y="314">Closets</text>
+        </g>
+
+        <g class="edge blue" data-edge="tomahawk" tabindex="0" role="button" aria-label="Ski Tomahawk, blue square">
+          <path class="hit"  d="M 660 224 C 706 304, 722 434, 692 524 C 660 588, 522 608, 462 614"/>
+          <path class="line" d="M 660 224 C 706 304, 722 434, 692 524 C 660 588, 522 608, 462 614"/>
+          <g class="mk"><rect x="700" y="420" width="11" height="11"/></g>
+          <text class="lbl" x="716" y="430">Tomahawk</text>
+        </g>
+
+        <g class="edge blue" data-edge="heavenly" tabindex="0" role="button" aria-label="Ski Heavenly Daze, blue square">
+          <path class="hit"  d="M 450 336 C 426 404, 422 482, 432 548 C 438 588, 448 604, 452 612"/>
+          <path class="line" d="M 450 336 C 426 404, 422 482, 432 548 C 438 588, 448 604, 452 612"/>
+          <g class="mk"><rect x="414" y="470" width="11" height="11"/></g>
+          <text class="lbl" x="332" y="480">Heavenly Daze</text>
+        </g>
+
+        <g class="edge green" data-edge="whynot" tabindex="0" role="button" aria-label="Ski Why Not, green circle">
+          <path class="hit"  d="M 460 336 C 494 400, 534 458, 530 522 C 526 576, 486 606, 458 614"/>
+          <path class="line" d="M 460 336 C 494 400, 534 458, 530 522 C 526 576, 486 606, 458 614"/>
+          <g class="mk"><circle cx="534" cy="500" r="6"/></g>
+          <text class="lbl" x="546" y="504">Why Not</text>
+        </g>
+
+        <g class="edge green" data-edge="rightoway" tabindex="0" role="button" aria-label="Ski Right-O-Way, green circle">
+          <path class="hit"  d="M 444 340 C 396 394, 326 444, 298 512 C 280 562, 362 602, 446 616"/>
+          <path class="line" d="M 444 340 C 396 394, 326 444, 298 512 C 280 562, 362 602, 446 616"/>
+          <g class="mk"><circle cx="294" cy="500" r="6"/></g>
+          <text class="lbl" x="192" y="504">Right-O-Way</text>
+        </g>
+
+        <!-- ============ NODES ============ -->
+        <circle class="node" id="n-summit"   cx="470" cy="76"  r="6"/>
+        <circle class="node" id="n-storm"    cx="346" cy="214" r="6"/>
+        <circle class="node" id="n-sunshine" cx="648" cy="216" r="6"/>
+        <circle class="node" id="n-thunder"  cx="456" cy="328" r="6"/>
+        <circle class="node" id="n-base"     cx="456" cy="612" r="6"/>
+
+        <text class="peaklbl" x="470" y="58"  text-anchor="middle">Mount Werner &middot; 10,568&#8242;</text>
+        <text class="peaklbl" x="300" y="204" text-anchor="middle">Storm Peak</text>
+        <text class="peaklbl" x="694" y="206" text-anchor="middle">Sunshine Peak</text>
+        <text class="peaklbl" x="456" y="352" text-anchor="middle">Thunderhead</text>
+        <text class="peaklbl" x="456" y="636" text-anchor="middle">Base Area</text>
+
+        <circle class="pulse" id="pulse" cx="456" cy="612" r="10"/>
+        <circle class="skier" id="skier" cx="456" cy="612" r="7.5"/>
+      </svg>
+
+      <div class="legend ui">
+        <span><i class="chip green"></i> Easier</span>
+        <span><i class="chip blue"></i> More difficult</span>
+        <span><i class="chip black"></i> Most difficult</span>
+        <span style="color:#9aa5b1">Dimmed trails don&#8217;t start where you are.</span>
+      </div>
+    </div>
+
+    <!-- ================= HUD ================= -->
+    <aside class="hud">
+      <div class="where ui">You are at</div>
+      <div class="loc" id="loc">Base Area</div>
+      <div class="elev ui" id="elev">6,900&#8242;</div>
+
+      <div class="prompt ui" id="prompt">From here you can:</div>
+      <ul class="opts ui" id="opts"></ul>
+
+      <div class="card-count ui">
+        <span id="count">0 of 9 runs skied</span>
+        <div class="ticks" id="ticks"></div>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer>Evan Witter &middot; <a href="mailto:wittere@bc.edu">wittere@bc.edu</a></footer>
+</div>
+
+<!-- ================= SHEET ================= -->
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true">
+  <button class="closer ui" id="closer">Close &times;</button>
+  <div class="sheet-in" id="sheet-in"></div>
+</div>
+
+<!-- =========================================================
+     CONTENT — edit the text below. Each <section class="beat">
+     is one section of a run. Leave the tags alone.
+     ========================================================= -->
+<div style="display:none" id="library">
+
+  <div class="src" id="src-whynot" data-cap="Steamboat&#8217;s longest beginner run &mdash; three miles, top to bottom.">
+    <section class="beat">
+      <h3>Where this started</h3>
+      <p>When I was young, my dad started a small industrial internet-of-things company. Growing up, he talked with me about the operational side of it, which I found genuinely interesting long before I knew what finance was.</p>
+    </section>
+    <section class="beat">
+      <h3>Then it got complicated</h3>
+      <p>In high school I watched close-by as the company neared financial distress &mdash; revenue problems, spending that had not been sustainable, and short-term borrowing to fund operations becoming nearly impossible almost overnight.</p>
+      <p>That is what introduced me to the depth and complexity of finance, and it is still why I find the downside more interesting than the upside.</p>
+    </section>
+  </div>
+
+  <div class="src" id="src-rightoway" data-cap="Lower mountain, Christie Peak.">
+    <section class="beat">
+      <h3>Off the mountain</h3>
+      <p>My family is originally from the Indianapolis area but moved to the Denver area just over two years ago, so proximity to a big city is part of what drew me to Boston College.</p>
+      <p>When I am home I mountain bike, hike, ski, and play piano. In Boston I spend most of my free time exploring the city and looking for new places to eat.</p>
+    </section>
+  </div>
+
+  <div class="src" id="src-buddys" data-cap="Named for Buddy Werner, the Olympian this mountain is named after.">
+    <section class="beat">
+      <h3>Respite care provider</h3>
+      <p>The summer before college I worked with families providing respite care to individuals with special needs. It was my first real experience of a fast-paced, team-based environment where the work changed hour to hour, and it is something I looked for more of once I got to campus.</p>
+    </section>
+  </div>
+
+  <div class="src" id="src-tomahawk" data-cap="The longest trail on the mountain &mdash; two miles off Sunshine Express.">
+    <section class="beat">
+      <h3>Coursework</h3>
+      <p>Financial Accounting (A), Fundamentals of Finance (A), Corporate Finance (in progress), Business Statistical Analysis (A). GPA 3.81, Dean&#8217;s List First Honors every semester.</p>
+      <p>Finance major, philosophy minor. The second one is there because I like arguments that have to hold up under pressure.</p>
+    </section>
+  </div>
+
+  <div class="src" id="src-heavenly" data-cap="The Women&#8217;s World Cup downhill run, straight under the gondola where everyone can watch.">
+    <section class="beat">
+      <h3>BC Investment Club &mdash; industrials analyst</h3>
+      <p>Working in a group of analysts, I have gotten more experience applying an analytical approach in a team rather than alone, which is the part of the pitch process I most wanted more of.</p>
+    </section>
+    <section class="beat">
+      <h3>Currently</h3>
+      <p>I am on a team building a buy pitch for Hubbell. [One sentence on the thesis once you have it &mdash; even a rough version is worth more here than describing the process.]</p>
+    </section>
+  </div>
+
+  <div class="src" id="src-concentration" data-cap="One of the first trails ever cut on this mountain.">
+    <section class="beat">
+      <h3>The Generac pitch</h3>
+      <p>I pitched Generac, a back-up generator manufacturer with significant residential and commercial/industrial applications. My argument was that weather-driven cyclicality was overshadowing aging grid infrastructure and rising instability &mdash; a structural demand driver the market was treating as a one-off.</p>
+    </section>
+    <section class="beat">
+      <h3>What it taught me</h3>
+      <p>Every qualitative claim had to become a number. Each thesis point needed a specific growth rate or margin over a defined horizon, or it did not survive. That discipline is the part I want more of.</p>
+      <p>I placed first out of more than 150 competitors and became an analyst as a result.</p>
+    </section>
+    <section class="beat">
+      <h3>What I would change</h3>
+      <p>[Write this one. A year on, which part of the thesis was weakest, or what would you test differently now? This is the paragraph that shows judgment rather than a result, and almost nobody includes it.]</p>
+    </section>
+  </div>
+
+  <div class="src" id="src-shadows" data-cap="Some of the best tree skiing on the mountain. There is no sign pointing you down it.">
+    <section class="beat">
+      <h3>Bankruptcy research assistant</h3>
+      <p>I assisted with bankruptcy research under Professor Edith Hotchkiss, working through documents from hundreds of cases. I also worked to implement LLM use to streamline the retrieval process and improve pace and accuracy.</p>
+    </section>
+    <section class="beat">
+      <h3>Reading past the task</h3>
+      <p>The job was retrieval, but I read the filings themselves. At one point I went through a conversion order to understand why a company had moved from Chapter 11 to Chapter 7, when all we needed was to record that it had.</p>
+      <p>[Add what you actually concluded &mdash; how differently companies in similar positions ended up, and what seemed to drive it. That observation is the most interesting thing on this site.]</p>
+    </section>
+  </div>
+
+  <div class="src" id="src-closets" data-cap="Tight trees off Sunshine Peak.">
+    <section class="beat">
+      <h3>BC Credit &amp; Restructuring Club</h3>
+      <p>Through weekly lectures, case studies, and a credit pitch competition, I found an interest in an area I previously knew almost nothing about &mdash; and one that turned out to be where my dad&#8217;s company&#8217;s problems actually lived.</p>
+    </section>
+    <section class="beat">
+      <h3>The Lumen short</h3>
+      <p>I pitched a short on a Lumen parent-company senior unsecured note, arguing that a prior divestiture whose proceeds funded a substantial refinancing had materially worsened that particular note&#8217;s position &mdash; even as it improved the company&#8217;s debt profile as a whole on paper.</p>
+    </section>
+    <section class="beat">
+      <h3>What I am following now</h3>
+      <p>MultiColor, a prime label manufacturer that went through a prepackaged Chapter 11 after cost inflation, industry destocking, and unsustainable leverage.</p>
+      <p>[One concrete thing the case taught you, or a question about it you still cannot answer. Specific beats general here.]</p>
+    </section>
+  </div>
+
+  <div class="src" id="src-nonames" data-cap="Off the summit of Mount Werner, into the chutes. The hardest way down.">
+    <section class="beat">
+      <h3>[The one that didn&#8217;t go well]</h3>
+      <p>[This is the run worth having on the map. Freshman fall, the BCIC interview you did not pass, whatever genuinely did not work. What happened, and what it cost.]</p>
+    </section>
+    <section class="beat">
+      <h3>[What changed]</h3>
+      <p>[What you actually did differently afterward &mdash; a mechanism, not a resolution. Then stop. Do not soften it; the honesty is the entire reason this run is on the map.]</p>
+    </section>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  /* ---------- the mountain ---------- */
+  var NODES = {
+    base:     {name:'Base Area',    elev:'6,900\u2032'},
+    thunder:  {name:'Thunderhead',  elev:'9,080\u2032'},
+    storm:    {name:'Storm Peak',   elev:'10,372\u2032'},
+    sunshine: {name:'Sunshine Peak',elev:'9,530\u2032'},
+    summit:   {name:'Mount Werner', elev:'10,568\u2032'}
+  };
+
+  var EDGES = {
+    /* lifts */
+    gondola:     {from:'base',    to:'thunder',  lift:'Gondola',              kind:'lift'},
+    stormexp:    {from:'thunder', to:'storm',    lift:'Storm Peak Express',   kind:'lift'},
+    sunshineexp: {from:'thunder', to:'sunshine', lift:'Sunshine Express',     kind:'lift'},
+    traverse:    {from:'storm',   to:'summit',   lift:'Summit traverse',      kind:'lift'},
+    /* trails */
+    nonames:       {from:'summit',   to:'storm',   name:'No Names',      diff:'black', label:'Double black diamond'},
+    concentration: {from:'storm',    to:'thunder', name:'Concentration', diff:'black', label:'Black diamond'},
+    buddys:        {from:'storm',    to:'thunder', name:'Buddy\u2019s Run', diff:'blue', label:'Blue square'},
+    shadows:       {from:'sunshine', to:'thunder', name:'Shadows',       diff:'black', label:'Black diamond'},
+    closets:       {from:'sunshine', to:'thunder', name:'Closets',       diff:'black', label:'Black diamond'},
+    tomahawk:      {from:'sunshine', to:'base',    name:'Tomahawk',      diff:'blue',  label:'Blue square'},
+    heavenly:      {from:'thunder',  to:'base',    name:'Heavenly Daze', diff:'blue',  label:'Blue square'},
+    whynot:        {from:'thunder',  to:'base',    name:'Why Not',       diff:'green', label:'Green circle'},
+    rightoway:     {from:'thunder',  to:'base',    name:'Right-O-Way',   diff:'green', label:'Green circle'}
+  };
+
+  var TRAILS = Object.keys(EDGES).filter(function(k){ return !EDGES[k].kind; });
+
+  /* ---------- state ---------- */
+  var at = 'base', skied = {}, moving = false;
+
+  var skier  = document.getElementById('skier'),
+      pulse  = document.getElementById('pulse'),
+      loc    = document.getElementById('loc'),
+      elev   = document.getElementById('elev'),
+      prompt = document.getElementById('prompt'),
+      opts   = document.getElementById('opts'),
+      count  = document.getElementById('count'),
+      ticks  = document.getElementById('ticks'),
+      sheet  = document.getElementById('sheet'),
+      sheetIn= document.getElementById('sheet-in'),
+      scrim  = document.getElementById('scrim');
+
+  function el(id){ return document.querySelector('[data-edge="' + id + '"]'); }
+  function pathOf(id){ return el(id).querySelector('.line'); }
+
+  /* ---------- render ---------- */
+  function render(){
+    loc.textContent  = NODES[at].name;
+    elev.textContent = NODES[at].elev;
+
+    Object.keys(EDGES).forEach(function(id){
+      var e = EDGES[id], g = el(id);
+      g.classList.toggle('open', e.from === at && !moving);
+      g.classList.toggle('done', !!skied[id]);
+      g.setAttribute('tabindex', e.from === at ? '0' : '-1');
+    });
+
+    document.querySelectorAll('.node').forEach(function(n){ n.classList.remove('here'); });
+    document.getElementById('n-' + at).classList.add('here');
+
+    var avail = Object.keys(EDGES).filter(function(id){ return EDGES[id].from === at; });
+    opts.innerHTML = '';
+    avail.forEach(function(id){
+      var e = EDGES[id], li = document.createElement('li'), b = document.createElement('button');
+      if(e.kind === 'lift'){
+        b.innerHTML = '<span>&uarr;&nbsp; ' + e.lift + '</span>' +
+                      '<span class="kind">to ' + NODES[e.to].name + '</span>';
+      } else {
+        b.innerHTML = '<i class="chip ' + e.diff + '"></i><span>' + e.name + '</span>' +
+                      '<span class="kind">' + (skied[id] ? 'skied' : 'ski it') + '</span>';
+        if(skied[id]) b.className = 'skied';
+      }
+      b.addEventListener('click', function(){ take(id); });
+      li.appendChild(b); opts.appendChild(li);
+    });
+
+    var n = TRAILS.filter(function(t){ return skied[t]; }).length;
+    count.textContent = n + ' of ' + TRAILS.length + ' runs skied';
+    ticks.innerHTML = '';
+    TRAILS.forEach(function(t){
+      var d = document.createElement('i');
+      d.className = 'tick' + (skied[t] ? ' on' : '');
+      ticks.appendChild(d);
+    });
+
+    prompt.textContent = (n === TRAILS.length)
+      ? 'You\u2019ve skied the whole mountain. Ride up and take another lap if you like.'
+      : 'From here you can:';
+  }
+
+  /* ---------- movement ---------- */
+  function take(id){
+    if(moving) return;
+    var e = EDGES[id], p = pathOf(id), len = p.getTotalLength(),
+        rev = false, t0 = null, dur = e.kind === 'lift' ? 1100 : 1500;
+
+    // path may be drawn in either direction; figure out which end we're at
+    var a = p.getPointAtLength(0), here = skier.getAttribute('cx') * 1,
+        hy = skier.getAttribute('cy') * 1;
+    if(Math.hypot(a.x - here, a.y - hy) > Math.hypot(p.getPointAtLength(len).x - here,
+       p.getPointAtLength(len).y - hy)) rev = true;
+
+    moving = true;
+    Object.keys(EDGES).forEach(function(k){ el(k).classList.remove('open'); });
+
+    function step(ts){
+      if(!t0) t0 = ts;
+      var k = Math.min(1, (ts - t0) / dur),
+          ease = k < .5 ? 2*k*k : 1 - Math.pow(-2*k + 2, 2)/2,
+          pt = p.getPointAtLength(len * (rev ? 1 - ease : ease));
+      skier.setAttribute('cx', pt.x); skier.setAttribute('cy', pt.y);
+      pulse.setAttribute('cx', pt.x); pulse.setAttribute('cy', pt.y);
+      if(k < 1) requestAnimationFrame(step);
+      else {
+        moving = false; at = e.to;
+        if(e.kind !== 'lift'){ skied[id] = true; openSheet(id); }
+        render();
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ---------- sheet ---------- */
+  function openSheet(id){
+    var e = EDGES[id], src = document.getElementById('src-' + id);
+    sheetIn.innerHTML =
+      '<div class="sign ui"><i class="chip ' + e.diff + '"></i>' +
+      (e.diff === 'black' && e.label.indexOf('Double') === 0 ? '<i class="chip black"></i>' : '') +
+      ' ' + e.label + '</div>' +
+      '<h2>' + e.name + '</h2>' +
+      '<p class="cap">' + (src ? src.getAttribute('data-cap') : '') + '</p>' +
+      (src ? src.innerHTML : '') +
+      '<div class="arrive">You come out at ' + NODES[e.to].name + '.' +
+      '<br><button id="ride">Back to the map</button></div>';
+    sheet.classList.add('on'); scrim.classList.add('on');
+    sheet.scrollTop = 0;
+    document.getElementById('ride').addEventListener('click', closeSheet);
+  }
+  function closeSheet(){ sheet.classList.remove('on'); scrim.classList.remove('on'); }
+
+  /* ---------- wire up ---------- */
+  Object.keys(EDGES).forEach(function(id){
+    var g = el(id);
+    g.addEventListener('click', function(){ if(EDGES[id].from === at) take(id); });
+    g.addEventListener('keydown', function(ev){
+      if((ev.key === 'Enter' || ev.key === ' ') && EDGES[id].from === at){ ev.preventDefault(); take(id); }
+    });
+  });
+  scrim.addEventListener('click', closeSheet);
+  document.getElementById('closer').addEventListener('click', closeSheet);
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeSheet(); });
+
+  render();
+})();
+</script>
+</body>
+</html>
