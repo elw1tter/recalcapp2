@@ -7,90 +7,95 @@
 <style>
 :root{
   --ink:#14171c; --soft:#5d646d; --rule:#dce2e9; --paper:#eef4fa; --panel:#fff;
-  --green:#18884a; --blue:#1f5fa8; --black:#14171c;
-  --snow-hi:#fff; --snow-lo:#d7e4f0; --rock:#b4c3d1; --tree:#4a6a55; --lift:#7c8794;
+  --green:#12844a; --blue:#1d5ea8; --black:#14171c;
+  --rock:#aebccb; --tree:#3f6350; --aspen:#8fae86; --lift:#c0392b; --bound:#d8a12a;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);
   font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
   font-size:17px;line-height:1.65;-webkit-text-size-adjust:100%}
 .ui{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
-.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+.wrap{max-width:1240px;margin:0 auto;padding:28px 20px 60px}
 
 .mast{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;
   padding-bottom:14px;border-bottom:1px solid var(--rule);margin-bottom:18px}
 .mast h1{margin:0 0 2px;font-size:27px;font-weight:600;letter-spacing:-.01em}
 .mast p{margin:0;font-size:14px;color:var(--soft)}
 .mast a{color:var(--soft);font-size:14px}
-.lede{max-width:660px;margin:0 0 20px;font-size:16.5px}
+.lede{max-width:680px;margin:0 0 20px;font-size:16.5px}
 
-/* ---------------- stage ---------------- */
-.stage{display:grid;grid-template-columns:1fr 300px;gap:26px;align-items:start}
-
-.map-card{background:linear-gradient(#fff,#e4eef7);border:1px solid var(--rule);
-  border-radius:5px;padding:6px 6px 0;position:relative;overflow:hidden}
+.stage{display:grid;grid-template-columns:1fr 292px;gap:24px;align-items:start}
+.map-card{background:#fff;border:1px solid var(--rule);border-radius:6px;
+  padding:5px 5px 0;overflow:hidden}
 svg{display:block;width:100%;height:auto}
 
-/* trails */
+/* ---------- edges ---------- */
 .edge .hit{fill:none;stroke:transparent;stroke-width:26;stroke-linecap:round}
-.edge .line{fill:none;stroke-width:3.4;stroke-linecap:round;transition:stroke-width .15s,opacity .3s}
-.edge .lbl{font-family:system-ui,sans-serif;font-size:11px;fill:var(--ink);
-  paint-order:stroke;stroke:#fff;stroke-width:3.4px;stroke-linejoin:round;transition:opacity .3s}
+.edge .line{fill:none;stroke-width:3.6;stroke-linecap:round;
+  transition:stroke-width .15s,opacity .3s}
+.edge .lbl{font-family:system-ui,sans-serif;font-size:12px;font-weight:500;fill:var(--ink);
+  paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
 .edge.green .line{stroke:var(--green)} .edge.green .mk{fill:var(--green)}
 .edge.blue  .line{stroke:var(--blue)}  .edge.blue  .mk{fill:var(--blue)}
 .edge.black .line{stroke:var(--black)} .edge.black .mk{fill:var(--black)}
-.edge.lift .line{stroke:var(--lift);stroke-width:1.4;stroke-dasharray:6 5}
-.edge.lift .lbl{font-size:9.5px;fill:var(--lift);letter-spacing:.08em}
+.edge.lift .line{stroke:var(--lift);stroke-width:1.6}
+.edge.lift .bdg circle{fill:#fff;stroke:var(--lift);stroke-width:1.6}
+.edge.lift .bdg text{font-family:system-ui,sans-serif;font-size:10px;font-weight:700;
+  fill:var(--lift);stroke:none}
 
-.edge{opacity:.22;pointer-events:none;transition:opacity .3s}
+.edge{opacity:.2;pointer-events:none;transition:opacity .3s}
 .edge.open{opacity:1;pointer-events:auto;cursor:pointer}
-.edge.done{opacity:.5}
+.edge.done{opacity:.48}
 .edge.done .line{stroke-dasharray:2 5}
 .edge.open:hover .line{stroke-width:6.5}
-.edge.open:hover .lbl{fill:#000}
-.edge.lift.open:hover .line{stroke-width:3}
+.edge.lift.open:hover .line{stroke-width:3.2}
 .edge:focus{outline:none}
 .edge.open:focus .line{stroke-width:6.5}
 
-.node{fill:#fff;stroke:var(--rock);stroke-width:2}
-.node.here{stroke:var(--ink);stroke-width:3}
-.peaklbl{font-family:system-ui,sans-serif;font-size:10.5px;fill:#68727e;
-  letter-spacing:.09em;text-transform:uppercase}
-.skier{fill:#14171c;stroke:#fff;stroke-width:2.5}
-.pulse{fill:none;stroke:var(--ink);stroke-width:2;opacity:0}
+.node{fill:#fff;stroke:#8496a8;stroke-width:1.8}
+.node.here{stroke:var(--ink);stroke-width:3.2}
+.peaklbl{font-family:system-ui,sans-serif;font-size:10.5px;font-weight:600;fill:#5b6874;
+  letter-spacing:.11em;text-transform:uppercase;paint-order:stroke;stroke:#fff;
+  stroke-width:3.5px;stroke-linejoin:round}
+.elevlbl{font-family:system-ui,sans-serif;font-size:9px;fill:#8695a4;letter-spacing:.06em;
+  paint-order:stroke;stroke:#fff;stroke-width:3px}
+.skier{fill:#14171c;stroke:#fff;stroke-width:2.6}
+.titleblk{font-family:system-ui,sans-serif;fill:#41505e}
+.legendbox{fill:#fff;stroke:var(--rule);stroke-width:1}
+.lgh{font-family:system-ui,sans-serif;font-size:9px;font-weight:700;fill:#8695a4;
+  letter-spacing:.14em;text-transform:uppercase}
+.lgt{font-family:system-ui,sans-serif;font-size:10.5px;fill:#41505e}
 
-.legend{display:flex;gap:16px;flex-wrap:wrap;padding:11px 8px;font-size:12.5px;
-  color:var(--soft);border-top:1px solid var(--rule);margin-top:4px}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.chip{width:10px;height:10px;display:inline-block;flex:none}
-.chip.green{background:var(--green);border-radius:50%}
-.chip.blue{background:var(--blue)}
-.chip.black{background:var(--black);transform:rotate(45deg)}
-
-/* ---------------- HUD ---------------- */
-.hud{background:var(--panel);border:1px solid var(--rule);border-radius:5px;
+/* ---------- HUD ---------- */
+.hud{background:var(--panel);border:1px solid var(--rule);border-radius:6px;
   padding:18px 18px 8px;position:sticky;top:18px}
-.hud .where{font-family:system-ui,sans-serif;font-size:11px;letter-spacing:.12em;
+.hud .where{font-family:system-ui,sans-serif;font-size:10.5px;letter-spacing:.13em;
   text-transform:uppercase;color:var(--soft);margin-bottom:3px}
-.hud .loc{font-size:20px;font-weight:600;margin-bottom:2px}
-.hud .elev{font-family:system-ui,sans-serif;font-size:13px;color:var(--soft);margin-bottom:14px}
-.hud .prompt{font-family:system-ui,sans-serif;font-size:13.5px;color:var(--soft);
-  border-top:1px solid var(--rule);padding-top:12px;margin-bottom:10px}
-.opts{list-style:none;margin:0 0 12px;padding:0}
-.opts li{margin-bottom:2px}
+.hud .loc{font-size:20px;font-weight:600;margin-bottom:1px}
+.hud .elev{font-family:system-ui,sans-serif;font-size:12.5px;color:var(--soft);margin-bottom:14px}
+.hud .prompt{font-family:system-ui,sans-serif;font-size:13px;color:var(--soft);
+  border-top:1px solid var(--rule);padding-top:12px;margin-bottom:8px}
+.opts{list-style:none;margin:0 0 10px;padding:0}
 .opts button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;
-  background:none;border:0;border-radius:3px;padding:8px 7px;cursor:pointer;
+  background:none;border:0;border-radius:4px;padding:8px 7px;cursor:pointer;
   font-family:system-ui,sans-serif;font-size:14.5px;color:var(--ink)}
 .opts button:hover{background:#eef4fa}
-.opts button .kind{margin-left:auto;font-size:11.5px;color:var(--soft)}
+.opts button .kind{margin-left:auto;font-size:11px;color:var(--soft)}
 .opts button.skied{color:var(--soft)}
+.liftmk{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--lift);
+  color:var(--lift);font-size:9.5px;font-weight:700;display:inline-flex;
+  align-items:center;justify-content:center;flex:none}
 .card-count{font-family:system-ui,sans-serif;font-size:12px;color:var(--soft);
   border-top:1px solid var(--rule);padding:11px 0;margin-top:4px}
 .ticks{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
 .tick{width:14px;height:5px;background:var(--rule);border-radius:2px}
 .tick.on{background:var(--ink)}
+.chip{width:10px;height:10px;display:inline-block;flex:none}
+.chip.green{background:var(--green);border-radius:50%}
+.chip.blue{background:var(--blue)}
+.chip.black{background:var(--black);transform:rotate(45deg)}
 
-/* ---------------- content sheet ---------------- */
+/* ---------- sheet ---------- */
 .scrim{position:fixed;inset:0;background:rgba(14,23,32,.42);opacity:0;pointer-events:none;
   transition:opacity .25s;z-index:40}
 .scrim.on{opacity:1;pointer-events:auto}
@@ -108,10 +113,9 @@ svg{display:block;width:100%;height:auto}
 .sheet .beat:first-child h3{margin-top:0}
 .closer{position:absolute;top:16px;right:18px;background:none;border:0;cursor:pointer;
   font-family:system-ui,sans-serif;font-size:13px;color:var(--soft)}
-.closer:hover{color:var(--ink)}
 .arrive{margin-top:32px;padding-top:20px;border-top:1px solid var(--rule);
   font-family:system-ui,sans-serif;font-size:14px;color:var(--soft)}
-.arrive button{background:none;border:1px solid var(--rule);border-radius:3px;
+.arrive button{background:none;border:1px solid var(--rule);border-radius:4px;
   font-family:system-ui,sans-serif;font-size:14px;padding:9px 15px;margin-top:11px;
   cursor:pointer;color:var(--ink)}
 .arrive button:hover{border-color:var(--ink)}
@@ -119,12 +123,11 @@ svg{display:block;width:100%;height:auto}
 footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
   font-family:system-ui,sans-serif;font-size:13.5px;color:var(--soft)}
 
-@media (max-width:900px){
+@media (max-width:920px){
   .stage{grid-template-columns:1fr;gap:16px}
   .hud{position:static}
-  .edge .lbl{font-size:14px;stroke-width:4.5px}
-  .edge.lift .lbl{font-size:12px}
-  .peaklbl{font-size:12.5px}
+  .edge .lbl{font-size:15px;stroke-width:5px}
+  .peaklbl{font-size:13px} .elevlbl{font-size:11px}
   .sheet{width:100%;top:auto;bottom:0;height:88%;transform:translateY(102%);
     border-radius:12px 12px 0 0}
   .sheet.on{transform:translateY(0)}
@@ -143,160 +146,214 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
     <a class="ui" href="mailto:wittere@bc.edu">wittere@bc.edu</a>
   </header>
 
-  <p class="lede">I grew up skiing Steamboat, so I built this site as the mountain. You start at the base and you can only ski what actually leaves from where you&#8217;re standing &mdash; ride a lift up, pick a run, and you&#8217;ll get a piece of how I ended up pointed at investment banking. Nine runs. Ski them in whatever order you like.</p>
+  <p class="lede">I grew up skiing Steamboat, so I built this site as the mountain. You start at the base and can only ski what actually leaves from where you&#8217;re standing &mdash; ride a lift, pick a run, and you&#8217;ll get a piece of how I ended up pointed at investment banking. Nine runs, in whatever order you like.</p>
 
   <div class="stage">
 
-    <!-- ================= MAP ================= -->
+    <!-- ===================== MAP ===================== -->
     <div class="map-card">
-      <svg id="map" viewBox="0 0 900 690" role="img" aria-label="Interactive trail map of Mount Werner">
+      <svg id="map" viewBox="0 0 1000 720" role="img" aria-label="Interactive trail map of Mount Werner">
         <defs>
-          <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="var(--snow-hi)"/>
-            <stop offset="58%" stop-color="#e9f2fa"/>
-            <stop offset="100%" stop-color="var(--snow-lo)"/>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#cfe4f5"/><stop offset="100%" stop-color="#eaf3fb"/>
           </linearGradient>
-          <g id="fir"><path d="M0 0 l5 13 -10 0 z" fill="var(--tree)" opacity=".5"/></g>
+          <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="45%" stop-color="#f2f8fd"/>
+            <stop offset="100%" stop-color="#dbe8f3"/>
+          </linearGradient>
+          <g id="fir"><path d="M0 0 l5.5 14 -11 0 z" fill="var(--tree)"/></g>
+          <g id="asp"><circle r="4" fill="var(--aspen)"/></g>
         </defs>
 
-        <path d="M 26 628 L 132 452 L 226 350 L 312 206 L 388 124 L 462 54 L 540 134 L 618 206 L 706 318 L 800 456 L 872 628 Z"
-              fill="url(#face)" stroke="var(--rock)" stroke-width="1.5" stroke-linejoin="round"/>
-        <path d="M 462 54 L 540 134 L 618 206 L 706 318 L 800 456 L 872 628 L 462 628 Z" fill="#0b2545" opacity=".04"/>
-        <path d="M 96 520 Q 300 470 462 470 Q 650 470 812 526" fill="none" stroke="var(--rock)" stroke-width=".8" opacity=".45"/>
-        <path d="M 170 420 Q 330 372 462 372 Q 610 372 742 424" fill="none" stroke="var(--rock)" stroke-width=".8" opacity=".45"/>
-        <path d="M 262 300 Q 370 262 462 262 Q 560 262 664 302" fill="none" stroke="var(--rock)" stroke-width=".8" opacity=".45"/>
+        <rect x="0" y="0" width="1000" height="300" fill="url(#sky)"/>
+        <!-- distant ridges -->
+        <path d="M 0 250 L 90 196 L 168 228 L 250 178 L 318 222 L 372 200 L 372 300 L 0 300 Z"
+              fill="#b9cfe2" opacity=".55"/>
+        <path d="M 640 214 L 724 168 L 800 206 L 884 160 L 960 204 L 1000 184 L 1000 300 L 640 300 Z"
+              fill="#b9cfe2" opacity=".55"/>
 
-        <g>
-          <use href="#fir" x="214" y="474"/><use href="#fir" x="230" y="490"/><use href="#fir" x="200" y="498"/>
-          <use href="#fir" x="182" y="522"/><use href="#fir" x="246" y="466"/>
-          <use href="#fir" x="596" y="402"/><use href="#fir" x="614" y="420"/><use href="#fir" x="580" y="428"/>
-          <use href="#fir" x="632" y="396"/><use href="#fir" x="650" y="434"/><use href="#fir" x="608" y="452"/>
-          <use href="#fir" x="676" y="456"/><use href="#fir" x="694" y="482"/><use href="#fir" x="658" y="490"/>
-          <use href="#fir" x="370" y="544"/><use href="#fir" x="388" y="560"/><use href="#fir" x="352" y="566"/>
-          <use href="#fir" x="288" y="348"/><use href="#fir" x="304" y="366"/><use href="#fir" x="272" y="372"/>
-          <use href="#fir" x="516" y="296"/><use href="#fir" x="532" y="314"/><use href="#fir" x="500" y="320"/>
+        <!-- massif -->
+        <path d="M 34 668 L 150 470 L 250 360 L 342 212 L 424 148 L 520 76
+                 L 620 158 L 712 222 L 812 342 L 912 492 L 968 668 Z"
+              fill="url(#face)" stroke="#9fb3c6" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M 520 76 L 620 158 L 712 222 L 812 342 L 912 492 L 968 668 L 520 668 Z"
+              fill="#0b2545" opacity=".045"/>
+
+        <!-- boundary -->
+        <path d="M 58 652 L 164 478 L 262 372 L 350 228 L 428 164 L 520 94
+                 L 612 172 L 702 236 L 800 352 L 896 496 L 946 652"
+              fill="none" stroke="var(--bound)" stroke-width="1.6" stroke-dasharray="7 6" opacity=".75"/>
+
+        <!-- contours -->
+        <path d="M 108 540 Q 320 486 512 486 Q 700 486 880 544" fill="none" stroke="#aebccb" stroke-width=".8" opacity=".5"/>
+        <path d="M 186 432 Q 356 382 512 382 Q 672 382 828 436" fill="none" stroke="#aebccb" stroke-width=".8" opacity=".5"/>
+        <path d="M 278 306 Q 400 266 512 266 Q 626 266 742 310" fill="none" stroke="#aebccb" stroke-width=".8" opacity=".5"/>
+
+        <!-- rock outcrops near summit -->
+        <path d="M 462 114 l 16 -9 14 11 -12 8 z" fill="#9aa8b6" opacity=".7"/>
+        <path d="M 556 128 l 18 -8 13 12 -14 8 z" fill="#9aa8b6" opacity=".7"/>
+
+        <!-- tree stands (kept clear of labels and lines) -->
+        <g opacity=".62">
+          <use href="#fir" x="196" y="486"/><use href="#fir" x="214" y="504"/><use href="#fir" x="180" y="512"/>
+          <use href="#fir" x="232" y="478"/><use href="#fir" x="162" y="538"/><use href="#fir" x="200" y="546"/>
+          <use href="#fir" x="238" y="524"/><use href="#fir" x="142" y="576"/><use href="#fir" x="184" y="586"/>
+          <use href="#fir" x="838" y="446"/><use href="#fir" x="856" y="466"/><use href="#fir" x="822" y="474"/>
+          <use href="#fir" x="874" y="440"/><use href="#fir" x="892" y="492"/><use href="#fir" x="846" y="506"/>
+          <use href="#fir" x="880" y="536"/><use href="#fir" x="908" y="560"/><use href="#fir" x="862" y="574"/>
+          <use href="#fir" x="372" y="612"/><use href="#fir" x="392" y="628"/><use href="#fir" x="352" y="632"/>
+          <use href="#fir" x="612" y="614"/><use href="#fir" x="632" y="630"/><use href="#fir" x="594" y="634"/>
+          <use href="#fir" x="286" y="286"/><use href="#fir" x="302" y="304"/><use href="#fir" x="270" y="312"/>
+          <use href="#fir" x="640" y="186"/><use href="#fir" x="658" y="202"/><use href="#fir" x="622" y="206"/>
+        </g>
+        <g opacity=".5">
+          <use href="#asp" x="268" y="418"/><use href="#asp" x="286" y="432"/><use href="#asp" x="252" y="440"/>
+          <use href="#asp" x="762" y="402"/><use href="#asp" x="780" y="418"/><use href="#asp" x="746" y="424"/>
         </g>
 
-        <!-- ============ LIFTS ============ -->
+        <!-- title block -->
+        <text class="titleblk" x="36" y="52" font-size="17" font-weight="700" letter-spacing="3">MOUNT WERNER</text>
+        <text class="titleblk" x="36" y="70" font-size="10" letter-spacing="2.2" opacity=".75">STEAMBOAT SPRINGS, COLORADO</text>
+        <text class="titleblk" x="36" y="88" font-size="9.5" letter-spacing=".6" opacity=".6">Nine runs. Ski them in any order.</text>
+
+        <!-- ================= LIFTS ================= -->
         <g class="edge lift" data-edge="gondola" tabindex="0" role="button" aria-label="Ride the gondola to Thunderhead">
-          <path class="hit"  d="M 470 606 L 464 334"/>
-          <path class="line" d="M 470 606 L 464 334"/>
-          <text class="lbl" x="476" y="486">GONDOLA</text>
+          <path class="hit"  d="M 536 626 L 524 376"/>
+          <path class="line" d="M 536 626 L 524 376"/>
+          <g class="bdg"><circle cx="530" cy="504" r="9.5"/><text x="530" y="507.5" text-anchor="middle">1</text></g>
         </g>
-        <g class="edge lift" data-edge="stormexp" tabindex="0" role="button" aria-label="Ride Storm Peak Express">
-          <path class="hit"  d="M 444 320 L 354 224"/>
-          <path class="line" d="M 444 320 L 354 224"/>
-          <text class="lbl" x="366" y="258" transform="rotate(-46 366 258)">STORM PEAK EXPRESS</text>
+        <g class="edge lift" data-edge="stormexp" tabindex="0" role="button" aria-label="Ride Storm Peak Express to Storm Peak">
+          <path class="hit"  d="M 486 350 L 368 226"/>
+          <path class="line" d="M 486 350 L 368 226"/>
+          <g class="bdg"><circle cx="427" cy="288" r="9.5"/><text x="427" y="291.5" text-anchor="middle">2</text></g>
         </g>
-        <g class="edge lift" data-edge="sunshineexp" tabindex="0" role="button" aria-label="Ride Sunshine Express">
-          <path class="hit"  d="M 468 320 L 640 226"/>
-          <path class="line" d="M 468 320 L 640 226"/>
-          <text class="lbl" x="500" y="292" transform="rotate(-29 500 292)">SUNSHINE EXPRESS</text>
+        <g class="edge lift" data-edge="sunshineexp" tabindex="0" role="button" aria-label="Ride Sunshine Express to Sunshine Peak">
+          <path class="hit"  d="M 520 348 L 698 242"/>
+          <path class="line" d="M 520 348 L 698 242"/>
+          <g class="bdg"><circle cx="572" cy="317" r="9.5"/><text x="572" y="320.5" text-anchor="middle">3</text></g>
         </g>
         <g class="edge lift" data-edge="traverse" tabindex="0" role="button" aria-label="Traverse to the summit">
-          <path class="hit"  d="M 340 206 C 370 158, 424 116, 458 84"/>
-          <path class="line" d="M 340 206 C 370 158, 424 116, 458 84"/>
-          <text class="lbl" x="346" y="146" transform="rotate(-42 346 146)">SUMMIT TRAVERSE</text>
+          <path class="hit"  d="M 346 202 C 378 158, 448 114, 506 90"/>
+          <path class="line" d="M 346 202 C 378 158, 448 114, 506 90"/>
+          <g class="bdg"><circle cx="414" cy="137" r="9.5"/><text x="414" y="140.5" text-anchor="middle">4</text></g>
         </g>
 
-        <!-- ============ TRAILS ============ -->
-        <g class="edge black" data-edge="nonames" tabindex="0" role="button" aria-label="Ski No Names, double black">
-          <path class="hit"  d="M 474 84 C 452 128, 404 166, 352 212"/>
-          <path class="line" d="M 474 84 C 452 128, 404 166, 352 212"/>
-          <g class="mk"><path d="M 488 82 l 6 7 -6 7 -6 -7 z"/><path d="M 501 82 l 6 7 -6 7 -6 -7 z"/></g>
-          <text class="lbl" x="514" y="94">No Names</text>
+        <!-- ================= TRAILS ================= -->
+        <g class="edge black" data-edge="nonames" tabindex="0" role="button" aria-label="Ski No Names, double black diamond">
+          <path class="hit"  d="M 522 94 C 496 132, 440 172, 360 210"/>
+          <path class="line" d="M 522 94 C 496 132, 440 172, 360 210"/>
+          <g class="mk"><path d="M 546 96 l 6 7 -6 7 -6 -7 z"/><path d="M 559 96 l 6 7 -6 7 -6 -7 z"/></g>
+          <text class="lbl" x="574" y="108">No Names</text>
         </g>
 
         <g class="edge black" data-edge="concentration" tabindex="0" role="button" aria-label="Ski Concentration, black diamond">
-          <path class="hit"  d="M 350 222 C 372 260, 406 292, 448 322"/>
-          <path class="line" d="M 350 222 C 372 260, 406 292, 448 322"/>
-          <g class="mk"><path d="M 386 262 l 6 7 -6 7 -6 -7 z"/></g>
-          <text class="lbl" x="398" y="276">Concentration</text>
+          <path class="hit"  d="M 358 220 C 386 260, 432 306, 496 354"/>
+          <path class="line" d="M 358 220 C 386 260, 432 306, 496 354"/>
+          <g class="mk"><path d="M 402 240 l 6 7 -6 7 -6 -7 z"/></g>
+          <text class="lbl" x="418" y="252">Concentration</text>
         </g>
 
         <g class="edge blue" data-edge="buddys" tabindex="0" role="button" aria-label="Ski Buddy's Run, blue square">
-          <path class="hit"  d="M 338 224 C 306 284, 350 322, 444 330"/>
-          <path class="line" d="M 338 224 C 306 284, 350 322, 444 330"/>
-          <g class="mk"><rect x="312" y="278" width="11" height="11"/></g>
-          <text class="lbl" x="232" y="290">Buddy&#8217;s Run</text>
+          <path class="hit"  d="M 346 222 C 296 282, 290 342, 348 374 C 404 400, 462 386, 498 366"/>
+          <path class="line" d="M 346 222 C 296 282, 290 342, 348 374 C 404 400, 462 386, 498 366"/>
+          <g class="mk"><rect x="268" y="292" width="11" height="11"/></g>
+          <text class="lbl" x="262" y="302" text-anchor="end">Buddy&#8217;s Run</text>
         </g>
 
         <g class="edge black" data-edge="shadows" tabindex="0" role="button" aria-label="Ski Shadows, black diamond">
-          <path class="hit"  d="M 644 224 C 614 266, 550 302, 466 322"/>
-          <path class="line" d="M 644 224 C 614 266, 550 302, 466 322"/>
-          <g class="mk"><path d="M 584 272 l 6 7 -6 7 -6 -7 z"/></g>
-          <text class="lbl" x="596" y="286">Shadows</text>
+          <path class="hit"  d="M 704 234 C 666 272, 606 314, 508 352"/>
+          <path class="line" d="M 704 234 C 666 272, 606 314, 508 352"/>
+          <g class="mk"><path d="M 726 246 l 6 7 -6 7 -6 -7 z"/></g>
+          <text class="lbl" x="742" y="258">Shadows</text>
         </g>
 
         <g class="edge black" data-edge="closets" tabindex="0" role="button" aria-label="Ski Closets, black diamond">
-          <path class="hit"  d="M 654 230 C 652 296, 566 336, 470 336"/>
-          <path class="line" d="M 654 230 C 652 296, 566 336, 470 336"/>
-          <g class="mk"><path d="M 640 300 l 6 7 -6 7 -6 -7 z"/></g>
-          <text class="lbl" x="654" y="314">Closets</text>
+          <path class="hit"  d="M 714 240 C 708 302, 632 350, 514 368"/>
+          <path class="line" d="M 714 240 C 708 302, 632 350, 514 368"/>
+          <g class="mk"><path d="M 730 300 l 6 7 -6 7 -6 -7 z"/></g>
+          <text class="lbl" x="746" y="312">Closets</text>
         </g>
 
         <g class="edge blue" data-edge="tomahawk" tabindex="0" role="button" aria-label="Ski Tomahawk, blue square">
-          <path class="hit"  d="M 660 224 C 706 304, 722 434, 692 524 C 660 588, 522 608, 462 614"/>
-          <path class="line" d="M 660 224 C 706 304, 722 434, 692 524 C 660 588, 522 608, 462 614"/>
-          <g class="mk"><rect x="700" y="420" width="11" height="11"/></g>
-          <text class="lbl" x="716" y="430">Tomahawk</text>
+          <path class="hit"  d="M 720 238 C 792 322, 822 462, 780 562 C 740 634, 600 652, 512 640"/>
+          <path class="line" d="M 720 238 C 792 322, 822 462, 780 562 C 740 634, 600 652, 512 640"/>
+          <g class="mk"><rect x="806" y="512" width="11" height="11"/></g>
+          <text class="lbl" x="824" y="522">Tomahawk</text>
         </g>
 
         <g class="edge blue" data-edge="heavenly" tabindex="0" role="button" aria-label="Ski Heavenly Daze, blue square">
-          <path class="hit"  d="M 450 336 C 426 404, 422 482, 432 548 C 438 588, 448 604, 452 612"/>
-          <path class="line" d="M 450 336 C 426 404, 422 482, 432 548 C 438 588, 448 604, 452 612"/>
-          <g class="mk"><rect x="414" y="470" width="11" height="11"/></g>
-          <text class="lbl" x="332" y="480">Heavenly Daze</text>
+          <path class="hit"  d="M 498 374 C 474 442, 470 522, 482 582 C 488 612, 494 626, 498 634"/>
+          <path class="line" d="M 498 374 C 474 442, 470 522, 482 582 C 488 612, 494 626, 498 634"/>
+          <g class="mk"><rect x="452" y="462" width="11" height="11"/></g>
+          <text class="lbl" x="446" y="472" text-anchor="end">Heavenly Daze</text>
         </g>
 
         <g class="edge green" data-edge="whynot" tabindex="0" role="button" aria-label="Ski Why Not, green circle">
-          <path class="hit"  d="M 460 336 C 494 400, 534 458, 530 522 C 526 576, 486 606, 458 614"/>
-          <path class="line" d="M 460 336 C 494 400, 534 458, 530 522 C 526 576, 486 606, 458 614"/>
-          <g class="mk"><circle cx="534" cy="500" r="6"/></g>
-          <text class="lbl" x="546" y="504">Why Not</text>
+          <path class="hit"  d="M 508 374 C 548 438, 586 502, 576 558 C 564 610, 524 632, 506 636"/>
+          <path class="line" d="M 508 374 C 548 438, 586 502, 576 558 C 564 610, 524 632, 506 636"/>
+          <g class="mk"><circle cx="598" cy="496" r="6"/></g>
+          <text class="lbl" x="612" y="500">Why Not</text>
         </g>
 
         <g class="edge green" data-edge="rightoway" tabindex="0" role="button" aria-label="Ski Right-O-Way, green circle">
-          <path class="hit"  d="M 444 340 C 396 394, 326 444, 298 512 C 280 562, 362 602, 446 616"/>
-          <path class="line" d="M 444 340 C 396 394, 326 444, 298 512 C 280 562, 362 602, 446 616"/>
-          <g class="mk"><circle cx="294" cy="500" r="6"/></g>
-          <text class="lbl" x="192" y="504">Right-O-Way</text>
+          <path class="hit"  d="M 492 372 C 432 422, 342 454, 308 522 C 288 576, 382 624, 488 638"/>
+          <path class="line" d="M 492 372 C 432 422, 342 454, 308 522 C 288 576, 382 624, 488 638"/>
+          <g class="mk"><circle cx="330" cy="430" r="6"/></g>
+          <text class="lbl" x="316" y="434" text-anchor="end">Right-O-Way</text>
         </g>
 
-        <!-- ============ NODES ============ -->
-        <circle class="node" id="n-summit"   cx="470" cy="76"  r="6"/>
-        <circle class="node" id="n-storm"    cx="346" cy="214" r="6"/>
-        <circle class="node" id="n-sunshine" cx="648" cy="216" r="6"/>
-        <circle class="node" id="n-thunder"  cx="456" cy="328" r="6"/>
-        <circle class="node" id="n-base"     cx="456" cy="612" r="6"/>
+        <!-- ================= NODES ================= -->
+        <circle class="node" id="n-summit"   cx="520" cy="86"  r="6"/>
+        <circle class="node" id="n-storm"    cx="354" cy="214" r="6"/>
+        <circle class="node" id="n-sunshine" cx="710" cy="228" r="6"/>
+        <circle class="node" id="n-thunder"  cx="502" cy="362" r="6"/>
+        <circle class="node" id="n-base"     cx="500" cy="636" r="6"/>
 
-        <text class="peaklbl" x="470" y="58"  text-anchor="middle">Mount Werner &middot; 10,568&#8242;</text>
-        <text class="peaklbl" x="300" y="204" text-anchor="middle">Storm Peak</text>
-        <text class="peaklbl" x="694" y="206" text-anchor="middle">Sunshine Peak</text>
-        <text class="peaklbl" x="456" y="352" text-anchor="middle">Thunderhead</text>
-        <text class="peaklbl" x="456" y="636" text-anchor="middle">Base Area</text>
+        <text class="peaklbl" x="520" y="62"  text-anchor="middle">Mount Werner</text>
+        <text class="elevlbl" x="520" y="74"  text-anchor="middle">10,568&#8242;</text>
+        <text class="peaklbl" x="330" y="196" text-anchor="end">Storm Peak</text>
+        <text class="peaklbl" x="734" y="212" text-anchor="start">Sunshine Peak</text>
+        <text class="peaklbl" x="502" y="392" text-anchor="middle">Thunderhead</text>
+        <text class="peaklbl" x="500" y="662" text-anchor="middle">Base Area</text>
 
-        <circle class="pulse" id="pulse" cx="456" cy="612" r="10"/>
-        <circle class="skier" id="skier" cx="456" cy="612" r="7.5"/>
+        <!-- ================= LEGEND ================= -->
+        <g>
+          <rect class="legendbox" x="30" y="452" width="214" height="206" rx="4"/>
+          <text class="lgh" x="46" y="474">Difficulty</text>
+          <circle cx="52" cy="492" r="5.5" fill="var(--green)"/>
+          <text class="lgt" x="68" y="496">Easier</text>
+          <rect x="47" y="507" width="11" height="11" fill="var(--blue)"/>
+          <text class="lgt" x="68" y="517">More difficult</text>
+          <path d="M 52 528 l 6 7 -6 7 -6 -7 z" fill="var(--black)"/>
+          <text class="lgt" x="68" y="539">Most difficult</text>
+
+          <text class="lgh" x="46" y="568">Lifts</text>
+          <circle cx="52" cy="584" r="7.5" fill="#fff" stroke="var(--lift)" stroke-width="1.5"/>
+          <text x="52" y="587.5" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="var(--lift)">1</text>
+          <text class="lgt" x="68" y="588">Gondola</text>
+          <circle cx="52" cy="604" r="7.5" fill="#fff" stroke="var(--lift)" stroke-width="1.5"/>
+          <text x="52" y="607.5" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="var(--lift)">2</text>
+          <text class="lgt" x="68" y="608">Storm Peak Express</text>
+          <circle cx="52" cy="624" r="7.5" fill="#fff" stroke="var(--lift)" stroke-width="1.5"/>
+          <text x="52" y="627.5" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="var(--lift)">3</text>
+          <text class="lgt" x="68" y="628">Sunshine Express</text>
+          <circle cx="52" cy="644" r="7.5" fill="#fff" stroke="var(--lift)" stroke-width="1.5"/>
+          <text x="52" y="647.5" text-anchor="middle" font-family="system-ui" font-size="9" font-weight="700" fill="var(--lift)">4</text>
+          <text class="lgt" x="68" y="648">Summit traverse</text>
+        </g>
+
+        <circle class="skier" id="skier" cx="500" cy="636" r="7.5"/>
       </svg>
-
-      <div class="legend ui">
-        <span><i class="chip green"></i> Easier</span>
-        <span><i class="chip blue"></i> More difficult</span>
-        <span><i class="chip black"></i> Most difficult</span>
-        <span style="color:#9aa5b1">Dimmed trails don&#8217;t start where you are.</span>
-      </div>
     </div>
 
-    <!-- ================= HUD ================= -->
+    <!-- ===================== HUD ===================== -->
     <aside class="hud">
       <div class="where ui">You are at</div>
       <div class="loc" id="loc">Base Area</div>
       <div class="elev ui" id="elev">6,900&#8242;</div>
-
       <div class="prompt ui" id="prompt">From here you can:</div>
       <ul class="opts ui" id="opts"></ul>
-
       <div class="card-count ui">
         <span id="count">0 of 9 runs skied</span>
         <div class="ticks" id="ticks"></div>
@@ -308,7 +365,6 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
   <footer>Evan Witter &middot; <a href="mailto:wittere@bc.edu">wittere@bc.edu</a></footer>
 </div>
 
-<!-- ================= SHEET ================= -->
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true">
   <button class="closer ui" id="closer">Close &times;</button>
@@ -316,8 +372,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
 </div>
 
 <!-- =========================================================
-     CONTENT — edit the text below. Each <section class="beat">
-     is one section of a run. Leave the tags alone.
+     CONTENT — edit the text below. Leave the tags alone.
      ========================================================= -->
 <div style="display:none" id="library">
 
@@ -426,56 +481,45 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
 
 <script>
 (function(){
-  /* ---------- the mountain ---------- */
   var NODES = {
-    base:     {name:'Base Area',    elev:'6,900\u2032'},
-    thunder:  {name:'Thunderhead',  elev:'9,080\u2032'},
-    storm:    {name:'Storm Peak',   elev:'10,372\u2032'},
-    sunshine: {name:'Sunshine Peak',elev:'9,530\u2032'},
-    summit:   {name:'Mount Werner', elev:'10,568\u2032'}
+    base:     {name:'Base Area',     elev:'6,900\u2032'},
+    thunder:  {name:'Thunderhead',   elev:'9,080\u2032'},
+    storm:    {name:'Storm Peak',    elev:'10,372\u2032'},
+    sunshine: {name:'Sunshine Peak', elev:'9,530\u2032'},
+    summit:   {name:'Mount Werner',  elev:'10,568\u2032'}
   };
 
   var EDGES = {
-    /* lifts */
-    gondola:     {from:'base',    to:'thunder',  lift:'Gondola',              kind:'lift'},
-    stormexp:    {from:'thunder', to:'storm',    lift:'Storm Peak Express',   kind:'lift'},
-    sunshineexp: {from:'thunder', to:'sunshine', lift:'Sunshine Express',     kind:'lift'},
-    traverse:    {from:'storm',   to:'summit',   lift:'Summit traverse',      kind:'lift'},
-    /* trails */
-    nonames:       {from:'summit',   to:'storm',   name:'No Names',      diff:'black', label:'Double black diamond'},
-    concentration: {from:'storm',    to:'thunder', name:'Concentration', diff:'black', label:'Black diamond'},
-    buddys:        {from:'storm',    to:'thunder', name:'Buddy\u2019s Run', diff:'blue', label:'Blue square'},
-    shadows:       {from:'sunshine', to:'thunder', name:'Shadows',       diff:'black', label:'Black diamond'},
-    closets:       {from:'sunshine', to:'thunder', name:'Closets',       diff:'black', label:'Black diamond'},
-    tomahawk:      {from:'sunshine', to:'base',    name:'Tomahawk',      diff:'blue',  label:'Blue square'},
-    heavenly:      {from:'thunder',  to:'base',    name:'Heavenly Daze', diff:'blue',  label:'Blue square'},
-    whynot:        {from:'thunder',  to:'base',    name:'Why Not',       diff:'green', label:'Green circle'},
-    rightoway:     {from:'thunder',  to:'base',    name:'Right-O-Way',   diff:'green', label:'Green circle'}
+    gondola:     {from:'base',    to:'thunder',  lift:'Gondola',            no:1, kind:'lift'},
+    stormexp:    {from:'thunder', to:'storm',    lift:'Storm Peak Express', no:2, kind:'lift'},
+    sunshineexp: {from:'thunder', to:'sunshine', lift:'Sunshine Express',   no:3, kind:'lift'},
+    traverse:    {from:'storm',   to:'summit',   lift:'Summit traverse',    no:4, kind:'lift'},
+
+    nonames:       {from:'summit',   to:'storm',   name:'No Names',         diff:'black', label:'Double black diamond'},
+    concentration: {from:'storm',    to:'thunder', name:'Concentration',    diff:'black', label:'Black diamond'},
+    buddys:        {from:'storm',    to:'thunder', name:'Buddy\u2019s Run', diff:'blue',  label:'Blue square'},
+    shadows:       {from:'sunshine', to:'thunder', name:'Shadows',          diff:'black', label:'Black diamond'},
+    closets:       {from:'sunshine', to:'thunder', name:'Closets',          diff:'black', label:'Black diamond'},
+    tomahawk:      {from:'sunshine', to:'base',    name:'Tomahawk',         diff:'blue',  label:'Blue square'},
+    heavenly:      {from:'thunder',  to:'base',    name:'Heavenly Daze',    diff:'blue',  label:'Blue square'},
+    whynot:        {from:'thunder',  to:'base',    name:'Why Not',          diff:'green', label:'Green circle'},
+    rightoway:     {from:'thunder',  to:'base',    name:'Right-O-Way',      diff:'green', label:'Green circle'}
   };
 
   var TRAILS = Object.keys(EDGES).filter(function(k){ return !EDGES[k].kind; });
-
-  /* ---------- state ---------- */
   var at = 'base', skied = {}, moving = false;
 
-  var skier  = document.getElementById('skier'),
-      pulse  = document.getElementById('pulse'),
-      loc    = document.getElementById('loc'),
-      elev   = document.getElementById('elev'),
-      prompt = document.getElementById('prompt'),
-      opts   = document.getElementById('opts'),
-      count  = document.getElementById('count'),
-      ticks  = document.getElementById('ticks'),
-      sheet  = document.getElementById('sheet'),
-      sheetIn= document.getElementById('sheet-in'),
-      scrim  = document.getElementById('scrim');
+  var skier = document.getElementById('skier'), loc = document.getElementById('loc'),
+      elev = document.getElementById('elev'), prompt = document.getElementById('prompt'),
+      opts = document.getElementById('opts'), count = document.getElementById('count'),
+      ticks = document.getElementById('ticks'), sheet = document.getElementById('sheet'),
+      sheetIn = document.getElementById('sheet-in'), scrim = document.getElementById('scrim');
 
   function el(id){ return document.querySelector('[data-edge="' + id + '"]'); }
   function pathOf(id){ return el(id).querySelector('.line'); }
 
-  /* ---------- render ---------- */
   function render(){
-    loc.textContent  = NODES[at].name;
+    loc.textContent = NODES[at].name;
     elev.textContent = NODES[at].elev;
 
     Object.keys(EDGES).forEach(function(id){
@@ -488,12 +532,11 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
     document.querySelectorAll('.node').forEach(function(n){ n.classList.remove('here'); });
     document.getElementById('n-' + at).classList.add('here');
 
-    var avail = Object.keys(EDGES).filter(function(id){ return EDGES[id].from === at; });
     opts.innerHTML = '';
-    avail.forEach(function(id){
+    Object.keys(EDGES).filter(function(id){ return EDGES[id].from === at; }).forEach(function(id){
       var e = EDGES[id], li = document.createElement('li'), b = document.createElement('button');
       if(e.kind === 'lift'){
-        b.innerHTML = '<span>&uarr;&nbsp; ' + e.lift + '</span>' +
+        b.innerHTML = '<i class="liftmk">' + e.no + '</i><span>' + e.lift + '</span>' +
                       '<span class="kind">to ' + NODES[e.to].name + '</span>';
       } else {
         b.innerHTML = '<i class="chip ' + e.diff + '"></i><span>' + e.name + '</span>' +
@@ -512,23 +555,18 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
       d.className = 'tick' + (skied[t] ? ' on' : '');
       ticks.appendChild(d);
     });
-
     prompt.textContent = (n === TRAILS.length)
-      ? 'You\u2019ve skied the whole mountain. Ride up and take another lap if you like.'
+      ? 'You\u2019ve skied the whole mountain. Take another lap if you like.'
       : 'From here you can:';
   }
 
-  /* ---------- movement ---------- */
   function take(id){
     if(moving) return;
     var e = EDGES[id], p = pathOf(id), len = p.getTotalLength(),
-        rev = false, t0 = null, dur = e.kind === 'lift' ? 1100 : 1500;
-
-    // path may be drawn in either direction; figure out which end we're at
-    var a = p.getPointAtLength(0), here = skier.getAttribute('cx') * 1,
-        hy = skier.getAttribute('cy') * 1;
-    if(Math.hypot(a.x - here, a.y - hy) > Math.hypot(p.getPointAtLength(len).x - here,
-       p.getPointAtLength(len).y - hy)) rev = true;
+        hx = skier.getAttribute('cx') * 1, hy = skier.getAttribute('cy') * 1,
+        a = p.getPointAtLength(0), z = p.getPointAtLength(len),
+        rev = Math.hypot(a.x - hx, a.y - hy) > Math.hypot(z.x - hx, z.y - hy),
+        t0 = null, dur = e.kind === 'lift' ? 1100 : 1500;
 
     moving = true;
     Object.keys(EDGES).forEach(function(k){ el(k).classList.remove('open'); });
@@ -539,7 +577,6 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
           ease = k < .5 ? 2*k*k : 1 - Math.pow(-2*k + 2, 2)/2,
           pt = p.getPointAtLength(len * (rev ? 1 - ease : ease));
       skier.setAttribute('cx', pt.x); skier.setAttribute('cy', pt.y);
-      pulse.setAttribute('cx', pt.x); pulse.setAttribute('cy', pt.y);
       if(k < 1) requestAnimationFrame(step);
       else {
         moving = false; at = e.to;
@@ -550,25 +587,22 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
     requestAnimationFrame(step);
   }
 
-  /* ---------- sheet ---------- */
   function openSheet(id){
-    var e = EDGES[id], src = document.getElementById('src-' + id);
+    var e = EDGES[id], src = document.getElementById('src-' + id),
+        dbl = e.label.indexOf('Double') === 0;
     sheetIn.innerHTML =
       '<div class="sign ui"><i class="chip ' + e.diff + '"></i>' +
-      (e.diff === 'black' && e.label.indexOf('Double') === 0 ? '<i class="chip black"></i>' : '') +
-      ' ' + e.label + '</div>' +
+      (dbl ? '<i class="chip black"></i>' : '') + ' ' + e.label + '</div>' +
       '<h2>' + e.name + '</h2>' +
       '<p class="cap">' + (src ? src.getAttribute('data-cap') : '') + '</p>' +
       (src ? src.innerHTML : '') +
       '<div class="arrive">You come out at ' + NODES[e.to].name + '.' +
       '<br><button id="ride">Back to the map</button></div>';
-    sheet.classList.add('on'); scrim.classList.add('on');
-    sheet.scrollTop = 0;
+    sheet.classList.add('on'); scrim.classList.add('on'); sheet.scrollTop = 0;
     document.getElementById('ride').addEventListener('click', closeSheet);
   }
   function closeSheet(){ sheet.classList.remove('on'); scrim.classList.remove('on'); }
 
-  /* ---------- wire up ---------- */
   Object.keys(EDGES).forEach(function(id){
     var g = el(id);
     g.addEventListener('click', function(){ if(EDGES[id].from === at) take(id); });
