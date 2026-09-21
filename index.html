@@ -22,6 +22,14 @@ body{margin:0;background:var(--paper);color:var(--ink);
 .mast h1{margin:0 0 2px;font-size:27px;font-weight:600;letter-spacing:-.01em}
 .mast p{margin:0;font-size:14px;color:var(--soft)}
 .mast a{color:var(--soft);font-size:14px}
+.who{display:flex;align-items:center;gap:15px}
+.headshot{width:58px;height:58px;border-radius:50%;object-fit:cover;
+  display:block;flex:none;border:1px solid var(--rule)}
+.shots{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 18px}
+.shots figure{margin:0}
+.shots img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;display:block}
+.shots figcaption{font-family:system-ui,sans-serif;font-size:11.5px;color:var(--soft);
+  margin-top:5px}
 .lede{max-width:680px;margin:0 0 20px;font-size:16.5px}
 
 .stage{display:grid;grid-template-columns:1fr 292px;gap:24px;align-items:start}
@@ -167,9 +175,13 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
 <div class="wrap">
 
   <header class="mast">
-    <div>
-      <h1>Evan Witter</h1>
-      <p class="ui">Sophomore at Boston College &middot; Finance major, Philosophy minor</p>
+    <div class="who">
+      <img class="headshot" src="headshot.jpeg" alt="Evan Witter"
+           onerror="this.style.display='none'">
+      <div>
+        <h1>Evan Witter</h1>
+        <p class="ui">Sophomore at Boston College &middot; Finance major, Philosophy minor</p>
+      </div>
     </div>
     <a class="ui" href="mailto:wittere@bc.edu">wittere@bc.edu</a>
   </header>
@@ -492,6 +504,16 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
       <h3>Who I am outside of academics</h3>
       <p>My family is originally from the Indianapolis area but moved to the Denver area just over two years ago, so proximity to a big city is part of what drew me to Boston College.</p>
       <p>When I am home I mountain bike, hike, ski, and play piano. In Boston I spend most of my free time exploring the city and looking for new places to eat.</p>
+      <div class="shots">
+        <figure>
+          <img src="skiing.jpg" alt="Skiing" onerror="this.parentNode.style.display='none'">
+          <figcaption>[caption]</figcaption>
+        </figure>
+        <figure>
+          <img src="sushi.jpg" alt="Sushi" onerror="this.parentNode.style.display='none'">
+          <figcaption>[caption]</figcaption>
+        </figure>
+      </div>
     </section>
   </div>
 
@@ -563,7 +585,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);
   <div class="src" id="src-nonames" data-cap="Off the summit of Mount Werner, into the chutes. The hardest way down.">
     <section class="beat">
       <h3>Failure</h3>
-      <p>First semester of my freshman year, a poor BC Investment Club interview resulted in me not getting into the analyst program. Because I wanted to go deeper into my finance interest at the time, I felt this was a major setback.</p>
+      <p>First semester of my freshman year, a poor BC Investment Club interview resulted in me not getting into the analyst program. Because I wanted to go deeper into finance interest at the time, I felt this was a major setback.</p>
     </section>
     <section class="beat">
       <h3>Growth under consistency</h3>
